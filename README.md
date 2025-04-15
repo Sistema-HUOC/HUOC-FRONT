@@ -27,7 +27,7 @@ Para rodar o projeto localmente, siga os passos abaixo:
 
 2. **Acesse a pasta do projeto:**
    ```bash
-   cd HUOC-FRONT
+   cd HUOC-FRONT/huoc-front
    ```
 
 3. **Instale as dependências:**
