@@ -43,9 +43,26 @@ export default function LoginPage() {
 
       // Armazene o token (se a API retornar um)
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-      // Redirecione para a página protegida
-      router.push("/managerPage");
+
+      // Redirecionamento baseado no email
+      switch (data.user.email) {
+        case "admin@email.com":
+          router.push("/managerPage");
+          break;
+        case "doctor@email.com":
+          router.push("/doctorPage");
+          break;
+        case "nurse@email.com":
+          router.push("/nursePage");
+          break;
+        case "researcher@email.com":
+          router.push("/researcherPage");
+          break;
+        default:
+          router.push("/"); 
+      }
     } catch (err: unknown) {
       if (err instanceof Error)
       setError(err.message);

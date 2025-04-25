@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import LogoutButton from "@/components/logoutButton/logoutButton"; 
 import Image from "next/image";
 
-export default function AdminHome() {
+export default function DoctorHome() {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
@@ -37,11 +37,11 @@ export default function AdminHome() {
             Olá, {userName}!
           </h1>
           <p className="text-content2 text-md mb-6">
-            Você está acessando a área administrativa do Sistema HUOC.
+            Você está acessando a área de pesquisadores do Sistema HUOC.
           </p>
         </div>
       </div>
-        <LogoutButton />
+      <LogoutButton />
     </div>
   );
 }
