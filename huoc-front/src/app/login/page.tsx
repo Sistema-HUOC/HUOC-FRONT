@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { BiLogIn, BiEnvelope, BiLock, BiShow } from "react-icons/bi";
+import { BiLogIn, BiEnvelope, BiLock, BiShow, BiHide } from "react-icons/bi";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -24,15 +25,15 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-      
 
-      /* Response p/ API Externa */
-      // const response = await fetch("https://suaapi.com/login", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ email, password }),
+
+        /* Response p/ API Externa */
+        // const response = await fetch("https://suaapi.com/login", {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
@@ -61,11 +62,11 @@ export default function LoginPage() {
           router.push("/researcherPage");
           break;
         default:
-          router.push("/"); 
+          router.push("/");
       }
     } catch (err: unknown) {
       if (err instanceof Error)
-      setError(err.message);
+        setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -124,7 +125,7 @@ export default function LoginPage() {
                     <BiLock className="text-xl" />
                   </span>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"} // <-- Muda o type dinamicamente!
                     id="password"
                     name="password"
                     value={password}
@@ -132,8 +133,11 @@ export default function LoginPage() {
                     required
                     className="pl-10 pr-10 py-2 w-full border text-gray-700 border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500"
                   />
-                  <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer">
-                    <BiShow className="text-xl" />
+                  <span
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+                    onClick={() => setShowPassword((prev) => !prev)} // <-- Toggle no clique
+                  >
+                    {showPassword ? <BiHide className="text-xl" /> : <BiShow className="text-xl" />}
                   </span>
                 </div>
               </div>
