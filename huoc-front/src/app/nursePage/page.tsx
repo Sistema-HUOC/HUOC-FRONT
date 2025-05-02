@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import LogoutButton from "@/components/logoutButton/logoutButton"; 
 import Image from "next/image";
 
 export default function NurseHome() {
   const [userName, setUserName] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -18,6 +20,11 @@ export default function NurseHome() {
       }
     }
   }, []);
+  
+
+  const handleNavigateToForm = () => {
+    router.push("/nursePage/clinicalForm"); 
+  };
 
   return (
     <div
@@ -39,6 +46,14 @@ export default function NurseHome() {
           <p className="text-content2 text-md mb-6">
             Você está acessando a área de enfermeiros do Sistema HUOC.
           </p>
+
+          <button
+            onClick={handleNavigateToForm}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow"
+          >
+            Preencher Sintomas Clínicos
+          </button>
+
         </div>
       </div>
       <LogoutButton />
