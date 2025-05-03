@@ -22,7 +22,7 @@ export default function NurseHome() {
   }, []);
 
   const handleNavigateToForm = () => {
-    router.push("/nursePage/centerNurse");
+    router.push("/nursePage/centralNurse");
   };
 
   return (
