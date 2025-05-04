@@ -65,6 +65,11 @@ body {
   font-size: 1.2rem;
 }
 
+.input {
+  @apply border border-gray-300 rounded px-4 py-2 text-gray-800 w-full;
+}
+
+
 @media (max-width: 600px) {
   .text-content1 {
     font-size: 2rem;
