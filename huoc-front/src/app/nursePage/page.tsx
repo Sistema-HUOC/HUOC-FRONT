@@ -25,6 +25,14 @@ export default function NurseHome() {
     router.push("/nursePage/centralNurse");
   };
 
+  const handleLogout = () => {
+    // Aqui você pode limpar o token/cookie/localStorage
+    localStorage.removeItem('token'); // ou o nome que você estiver usando
+
+    // Redirecionar para a tela de login
+    router.push('/login');
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
 
@@ -34,6 +42,14 @@ export default function NurseHome() {
           <Image src="/huoc-system.png" alt="Logo HUOC" width={40} height={40} />
           <h1 className="text-lg font-semibold text-gray-800">HUOC - Sistema de Coleta de Dados Clínicos</h1>
         </div>
+
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow transition"
+          title="Sair"
+        >
+          Sair
+        </button>
       </header>
 
       <main
@@ -55,6 +71,7 @@ export default function NurseHome() {
             
             Visualizar Pacientes
           </button>
+          
         </div>
 
         

@@ -17,6 +17,24 @@ export default function PatientListPage() {
     `${p.name} ${p.record}`.toLowerCase().includes(search.toLowerCase())
   );
 
+  const handleNavigateToForm = () => {
+    router.push("/nursePage/clinicalForm");
+  };
+
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleViewPatient = (patient: any) => {
+    setSelectedPatient(patient);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedPatient(null);
+  };
+
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navbar */}
@@ -25,6 +43,15 @@ export default function PatientListPage() {
           <Image src="/huoc-system.png" alt="Logo HUOC" width={40} height={40} />
           <h1 className="text-lg font-semibold text-gray-800">HUOC - Sistema de Coleta de Dados Clínicos</h1>
         </div>
+
+        <button
+        onClick={() => router.back()}
+        className="text-blue-700 hover:text-blue-900 font-semibold flex items-center gap-1 transition"
+        title="Voltar"
+      >
+        <i className="bi bi-arrow-left text-lg"></i>
+        <span>Voltar</span>
+      </button>
       </header>
 
       {/* Main content */}
@@ -64,9 +91,9 @@ export default function PatientListPage() {
                   <td className="py-2 px-4">{patient.name}</td>
                   <td className="py-2 px-4">{patient.record}</td>
                   <td className="py-2 px-4 text-center space-x-3">
-                    <button title="Anotações"><i className="bi bi-journal-text text-blue-600 hover:text-blue-800 text-xl"></i></button>
-                    <button title="Editar"><i className="bi bi-pencil-square text-yellow-600 hover:text-yellow-800 text-xl"></i></button>
-                    <button title="Visualizar"><i className="bi bi-eye-fill text-green-600 hover:text-green-800 text-xl"></i></button>
+                    <button title="Formulário de Sintomas" onClick={handleNavigateToForm}><i className="bi bi-journal-text text-blue-600 hover:text-blue-800 text-xl"></i></button>
+                    <button title="Editar Paciente"><i className="bi bi-pencil-square text-yellow-600 hover:text-yellow-800 text-xl"></i></button>
+                    <button title="Visualizar Paciente" onClick={() => handleViewPatient(patient)}><i className="bi bi-eye-fill text-green-600 hover:text-green-800 text-xl"></i></button>
                   </td>
                 </tr>
               ))}
@@ -81,6 +108,27 @@ export default function PatientListPage() {
           </table>
         </div>
       </main>
+
+      {/* Modal de Visualização do Paciente */}
+      {showModal && selectedPatient && (
+        <div className="fixed inset-0 bg-gray-950/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Dados do Paciente</h2>
+            <p className='text-black'><strong>Nome:</strong> {selectedPatient.name}</p>
+            <p className='text-black'><strong>Prontuário:</strong> {selectedPatient.record}</p>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={closeModal}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Footer */}
       <footer className="bg-[#BFDBFE] text-center py-4 text-sm text-gray-800">
