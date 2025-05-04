@@ -48,6 +48,7 @@ Para rodar o projeto localmente, siga os passos abaixo:
 ## 👨‍💻 Equipe do Frontend Web
 - **Robson Albuquerque** (Tech Leader - Frontend Web)
 - **Lucas Patrick** (Frontend Web)
+- **Kauã Gabriel** (Frontend Web)
 
 ---
 Caso tenha dúvidas ou sugestões, fique à vontade para contribuir! 🚀
