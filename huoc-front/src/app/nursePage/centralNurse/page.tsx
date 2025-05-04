@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function PatientListPage() {
   const [search, setSearch] = useState('');
@@ -21,7 +21,13 @@ export default function PatientListPage() {
     router.push("/nursePage/clinicalForm");
   };
 
-  const [selectedPatient, setSelectedPatient] = useState(null);
+  type Patient = {
+    id: number;
+    name: string;
+    record: string;
+  };
+
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   const handleViewPatient = (patient: any) => {
@@ -67,11 +73,11 @@ export default function PatientListPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
             <button
-              onClick={() => router.push('/nursePage/clinicalForm')}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-full shadow transition"
+              onClick={() => router.push('/nursePage/patientRegister')}
+              className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 rounded-full shadow transition"
               title="Adicionar Paciente">
               <i className="bi bi-person-plus-fill text-lg"></i>
-              <span>Adicionar Paciente</span>
+              <span>Cadastrar Paciente</span>
             </button>
 
           </div>

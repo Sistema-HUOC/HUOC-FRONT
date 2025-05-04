@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import LogoutButton from "@/components/logoutButton/logoutButton";
 import Image from "next/image";
 
 export default function NurseHome() {
@@ -26,10 +25,8 @@ export default function NurseHome() {
   };
 
   const handleLogout = () => {
-    // Aqui você pode limpar o token/cookie/localStorage
-    localStorage.removeItem('token'); // ou o nome que você estiver usando
+    localStorage.removeItem('token'); 
 
-    // Redirecionar para a tela de login
     router.push('/login');
   };
 
