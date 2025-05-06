@@ -35,12 +35,17 @@ Para rodar o projeto localmente, siga os passos abaixo:
    npm install
    ```
 
-4. **Inicie o servidor de desenvolvimento:**
+4. **Instale as dependências:**
+   ```bash
+   npm install chart.js react-chartjs-2 xlsx @fortawesome/fontawesome-free
+   ```
+
+5. **Inicie o servidor de desenvolvimento:**
    ```bash
    npm run dev
    ```
 
-5. **Acesse o projeto no navegador:**
+6. **Acesse o projeto no navegador:**
    ```
    http://localhost:3000
    ```
