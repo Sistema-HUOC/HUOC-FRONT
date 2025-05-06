@@ -46,8 +46,8 @@ export default function NewPatientsPage() {
                 </div>
                 <button
                     onClick={() => router.back()}
-                    className="text-blue-700 hover:text-blue-900 font-semibold flex items-center gap-1 transition"
-                >
+                    className="text-blue-700 mr-3 font-semibold flex items-center gap-1 transition-all transform hover:scale-105 cursor-pointer border-b-2 border-transparent hover:border-blue-700"
+                    title="Voltar">
                     <i className="bi bi-arrow-left text-lg"></i>
                     <span>Voltar</span>
                 </button>

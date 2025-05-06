@@ -9,11 +9,14 @@ export default function Interruptor() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Atualiza o estado inicial com base na rota atual
   useEffect(() => {
     if (pathname.includes('/nursePage/researcherPage')) {
       setIsChecked(false);
     } else if (pathname.includes('/nursePage')) {
+      setIsChecked(true);
+    } else if (pathname.includes('/doctorPage/researcherPage')) {
+      setIsChecked(false);
+    } else if (pathname.includes('/doctorPage')){
       setIsChecked(true);
     }
   }, [pathname]);
@@ -22,14 +25,17 @@ export default function Interruptor() {
     const checked = event.target.checked;
     setIsChecked(checked);
 
-    // Aguarda 1s antes de redirecionar
     setTimeout(() => {
       if (!checked && pathname.includes('/nursePage')) {
         router.push('/nursePage/researcherPage');
       } else if (checked && pathname.includes('/nursePage/researcherPage')) {
         router.push('/nursePage');
+      } else if (!checked && pathname.includes('/doctorPage')) {
+        router.push('/doctorPage/researcherPage');
+      } else if (checked && pathname.includes('/doctorPage/researcherPage')) {
+        router.push('/doctorPage');
       }
-    }, 1000);
+    }, 800); // 1s
   };
 
   return (

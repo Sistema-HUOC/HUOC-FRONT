@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+import Interruptor from '../../components/interruptor/LoveToggle';
+
 export default function DoctorHome() {
   const [userName, setUserName] = useState("");
   const router = useRouter();
@@ -19,10 +21,6 @@ export default function DoctorHome() {
       }
     }
   }, []);
-
-  const handleNavigateToForm = () => {
-    router.push("/doctorPage/centralDoctor");
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -41,13 +39,19 @@ export default function DoctorHome() {
           </h1>
         </div>
 
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow transition"
-          title="Sair"
-        >
-          Sair
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="mt-3">
+            <Interruptor/>
+          </div>
+          <span className="text-black pr-2 border-r-2">Doutor(a)</span>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow transition"
+            title="Sair"
+          >
+            Sair
+          </button>
+        </div>
       </header>
 
       {/* Conteúdo principal */}
