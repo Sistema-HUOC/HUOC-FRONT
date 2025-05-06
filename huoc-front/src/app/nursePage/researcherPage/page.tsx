@@ -5,9 +5,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
-const DashboardCharts = dynamic(() => import('../../components/dashboard/Dashboard'), {
+const DashboardCharts = dynamic(() => import('../../../components/dashboard/Dashboard'), {
   ssr: false,
 });
+
+import Interruptor from '../../../components/interruptor/LoveToggle';
 
 export default function ResearcherHome() {
     const [userName, setUserName] = useState("");
@@ -44,18 +46,16 @@ export default function ResearcherHome() {
 
           {/* Botões do lado direito */}
           <div className="flex items-center gap-3">
+            <div className="mt-3">
+              <Interruptor/>
+            </div>
+            <span className="text-black pr-2 border-r-2">Pesquisador</span>
+
             <button
-              onClick={() => router.push('/researcherPage/data-export')}
+              onClick={() => router.push('/nursePage/data-export')}
               className="text-blue-700 mr-3 font-semibold flex items-center gap-1 transition-all transform hover:scale-105 cursor-pointer border-b-2 border-transparent hover:border-blue-700"
               title="Exportar Dados">
               <span>Exportar Dados</span>
-            </button>
-
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow transition"
-              title="Sair">
-              Sair
             </button>
           </div>
         </header>
