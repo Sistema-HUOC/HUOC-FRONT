@@ -20,7 +20,7 @@ export default function Home() {
             </div>
 
             <Link href="/login">
-              <button className="w-full sm:w-2/3 md:w-1/2 lg:w-1/2 bg-cyan-600 hover:bg-cyan-800 text-white py-2 px-4 rounded-full transition-all">
+              <button className="w-full sm:w-2/3 md:w-1/2 lg:w-1/2 bg-cyan-600 hover:bg-cyan-800 text-white py-2 px-4 rounded-full transition duration-300 cursor-pointer">
                 <strong><i className="bi bi-box-arrow-in-right"></i> Login</strong>
               </button>
             </Link>

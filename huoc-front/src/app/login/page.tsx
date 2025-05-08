@@ -145,7 +145,7 @@ export default function LoginPage() {
               {/* Lembrar e Esqueci */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <input id="remember" name="remember" type="checkbox" className="h-4 w-4 text-cyan-600" />
+                  <input id="remember" name="remember" type="checkbox" className="text-cyan-600 dark:border-white-400/20 dark:scale-100 transition-all duration-500 ease-in-out dark:hover:scale-110 dark:checked:scale-100 h-4 w-4"/>
                   <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
                     Lembrar-me
                   </label>
