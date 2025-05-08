@@ -72,7 +72,7 @@ export default function PatientList({ patients, search, setSearch, onEdit, onVie
 
                             <div className="flex items-center gap-2">
                                 <i className={`bi ${patient.status === 'Novo' ? 'bi-star-fill text-blue-500' : 'bi-clock-fill text-yellow-500'}`}></i>
-                                <span className="text-sm font-medium">{patient.status}</span>
+                                <span className="text-sm font-medium text-black">{patient.status}</span>
                             </div>
 
                             <div className="mt-auto flex justify-end gap-4">

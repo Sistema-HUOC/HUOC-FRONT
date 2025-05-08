@@ -75,7 +75,7 @@ export default function PatientListPage() {
           <div className="mt-3">
             <Interruptor/>
           </div>
-          <span className="text-black pr-2 border-r-2">Enfermeiro</span>
+          <span className="text-black pr-2 border-r-2">Enfermeiro(a)</span>
           <button
             onClick={handleLogout}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow transition"
