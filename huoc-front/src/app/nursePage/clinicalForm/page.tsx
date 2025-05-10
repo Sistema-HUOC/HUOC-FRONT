@@ -195,24 +195,27 @@ export default function ClinicalForm() {
 
 
   return (
-    <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen">
       {/* Navbar */}
       <header className="bg-[#BFDBFE] flex items-center justify-between px-6 py-4 shadow-md">
         <div className="flex items-center gap-3">
           <Image src="/huoc-system.png" alt="Logo HUOC" width={40} height={40} />
           <h1 className="text-lg font-semibold text-gray-800">Formulário de Sintomatologia Clínica</h1>
-          </div>
-          <button
-              onClick={() => router.back()}
-              className="text-blue-700 mr-3 font-semibold flex items-center gap-1 transition-all transform hover:scale-105 cursor-pointer border-b-2 border-transparent hover:border-blue-700"
-              title="Voltar">
-                <i className="bi bi-arrow-left text-lg"></i>
-                <span>Voltar</span>
-          </button>
+        </div>
+        <button
+          onClick={() => router.back()}
+          className="text-blue-700 mr-3 font-semibold flex items-center gap-1 transition-all transform hover:scale-105 cursor-pointer border-b-2 border-transparent hover:border-blue-700"
+          title="Voltar">
+          <i className="bi bi-arrow-left text-lg"></i>
+          <span>Voltar</span>
+        </button>
       </header>
-      <main className="bg-[#BFDBFE] items-center justify-center px-4 border-t-1 border-b-1 border-gray-400"> 
+
+      {/* Main Content */}
+      <div className="flex-grow" style={{ backgroundImage: "url('/bg.jpg')", backgroundSize: "cover", backgroundPosition: "bottom" }}>
+        <div className="container mx-auto px-4 py-6">
           {/* Tabs */}
-          <div className="flex flex-wrap gap-2 mb-4 text-black mt-1 justify-center mt-3">
+          <div className="flex flex-wrap gap-2 mb-4 text-black justify-center">
             {tabs.map(tab => {
               const isActive = activeTab === tab;
               const status = formStatus[tab] || 'naoSalvo';
@@ -229,122 +232,107 @@ export default function ClinicalForm() {
               );
             })}
           </div>
-      </main>
-      
 
-      <main 
-        className="flex-grow flex flex-col items-center justify-center bg-cover bg-bottom px-4"
-        style={{ backgroundImage: "url('/bg.jpg')" }}
-      >
-      
-      {/* Symptoms */}
-      <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
-      {(symptomList[activeTab] || []).map((symptom) => (
-        <div key={symptom.key} className="space-y-2 text-black">
-          <label className="block font-medium">{symptom.label}</label>
-          <div className="flex items-center gap-4 text-gray-700 font-semibold text-sm">
-            <label>
-              <input
-                type="radio"
-                name={`${activeTab}-${symptom.key}`}
-                value="Não"
-                checked={formData[activeTab]?.[symptom.key] === "Não"}
-                onChange={() => handleInputChange(activeTab, symptom.key, "Não")}
-              />
-              <span className="ml-1">Não</span>
-            </label>
-            <label>
-              <input
-                type="radio"
-                name={`${activeTab}-${symptom.key}`}
-                value="Sim"
-                checked={formData[activeTab]?.[symptom.key] === "Sim"}
-                onChange={() => handleInputChange(activeTab, symptom.key, "Sim")}
-              />
-              <span className="ml-1">Sim</span>
-            </label>
+          {/* Symptoms Form */}
+          <div className="bg-white p-6 rounded-lg shadow-md max-w-100 mx-auto mt-10">
+            {(symptomList[activeTab] || []).map((symptom) => (
+              <div key={symptom.key} className="space-y-2 text-black mb-4">
+                <label className="block font-medium">{symptom.label}</label>
+                <div className="flex items-center gap-4 text-gray-700 font-semibold text-sm">
+                  <label>
+                    <input
+                      type="radio"
+                      name={`${activeTab}-${symptom.key}`}
+                      value="Não"
+                      checked={formData[activeTab]?.[symptom.key] === "Não"}
+                      onChange={() => handleInputChange(activeTab, symptom.key, "Não")}
+                    />
+                    <span className="ml-1">Não</span>
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name={`${activeTab}-${symptom.key}`}
+                      value="Sim"
+                      checked={formData[activeTab]?.[symptom.key] === "Sim"}
+                      onChange={() => handleInputChange(activeTab, symptom.key, "Sim")}
+                    />
+                    <span className="ml-1">Sim</span>
+                  </label>
 
-            
+                  {/* Campo de texto adicional */}
+                  {symptom.hasDetail && formData[activeTab]?.[symptom.key] === "Sim" && (
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      pattern="^\d{2}(\.\d)?$"
+                      maxLength={4}
+                      placeholder={symptom.detailLabel}
+                      className="border p-1 rounded"
+                      value={formData[activeTab]?.[`${symptom.key}Detalhe`] || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (/^\d{0,2}(\.\d?)?$/.test(val)) {
+                          handleInputChange(activeTab, `${symptom.key}Detalhe`, val);
+                        }
+                      }}
+                    />
+                  )}
 
-            {/* Campo de texto adicional */}
-            {symptom.hasDetail && formData[activeTab]?.[symptom.key] === "Sim" && (
-              <input
-                type="text"
-                inputMode="decimal"
-                pattern="^\d{2}(\.\d)?$"
-                maxLength={4}
-                placeholder={symptom.detailLabel}
-                className="border p-1 rounded"
-                value={formData[activeTab]?.[`${symptom.key}Detalhe`] || ""}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  // Aceita apenas até 2 dígitos, opcionalmente seguidos de ponto e 1 dígito decimal
-                  if (/^\d{0,2}(\.\d?)?$/.test(val)) {
-                    handleInputChange(activeTab, `${symptom.key}Detalhe`, val);
-                  }
-                }}
+                  {/* Opções adicionais */}
+                  {symptom.hasOptions &&
+                    formData[activeTab]?.[symptom.key] === "Sim" && (
+                      <div className="flex gap-2 ml-2">
+                        {symptom.hasOptions.map((opt: string) => (
+                          <label key={opt}>
+                            <input
+                              type="radio"
+                              name={`${activeTab}-${symptom.key}-type`}
+                              value={opt}
+                              checked={
+                                formData[activeTab]?.[`${symptom.key}Tipo`] === opt
+                              }
+                              onChange={() =>
+                                handleInputChange(activeTab, `${symptom.key}Tipo`, opt)
+                              }
+                            />
+                            <span className="ml-1">{opt}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                </div>
+              </div>
+            ))}
+
+            {/* Observações */}
+            <div className="mb-6">
+              <label className="block font-medium text-black">📝 Observações adicionais:</label>
+              <textarea
+                rows={3}
+                className="w-full border p-2 rounded"
+                onChange={(e) => handleInputChange(activeTab, "observacoes", e.target.value)}
               />
+            </div>
+
+            {/* Upload */}
+            {activeTab === "Geral" && (
+              <div className="mb-6">
+                <label className="block font-medium mb-2 text-black">📎 Anexar exames/laboratório:</label>
+                <input type="file" className="text-blue-700"/>
+              </div>
             )}
 
-            {/* Opções adicionais (ex: Seca / Produtiva) */}
-            {symptom.hasOptions &&
-              formData[activeTab]?.[symptom.key] === "Sim" && (
-                <div className="flex gap-2 ml-2">
-                  {symptom.hasOptions.map((opt: string) => (
-                    <label key={opt}>
-                      <input
-                        type="radio"
-                        name={`${activeTab}-${symptom.key}-type`}
-                        value={opt}
-                        checked={
-                          formData[activeTab]?.[`${symptom.key}Tipo`] === opt
-                        }
-                        onChange={() =>
-                          handleInputChange(activeTab, `${symptom.key}Tipo`, opt)
-                        }
-                      />
-                      <span className="ml-1">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
+            <div className="text-center">
+              <button
+                onClick={handlePartialSave}
+                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                💾 Salvar "{activeTab}"
+              </button>
+            </div>
           </div>
         </div>
-      ))}
-   
-
-
-        {/* Observações */}
-        <div>
-          <label className="block font-medium text-black">📝 Observações adicionais:</label>
-          <textarea
-            rows={3}
-            className="w-full border p-2 rounded"
-            onChange={(e) => handleInputChange(activeTab, "observacoes", e.target.value)}
-            />
-        </div>
       </div>
-
-      {/* Upload */}
-      {activeTab === "Geral" && (
-        <div className="mt-6">
-          <label className="block font-medium mb-2 text-black">📎 Anexar exames/laboratório:</label>
-          <input type="file" className="text-blue-700"/>
-        </div>
-      )}
-
-
-      <div className="mt-6">
-        <button
-          onClick={handlePartialSave}
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-          💾 Salvar "{activeTab}"
-        </button>
-      </div>
-
-      </main>
-      
-
 
       {/* Footer */}
       <footer className="bg-[#BFDBFE] text-center py-4 text-gray-800 text-sm">

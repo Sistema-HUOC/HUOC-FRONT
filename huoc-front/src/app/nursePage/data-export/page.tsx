@@ -5,38 +5,64 @@ import { useState } from "react";
 import Image from "next/image";
 import * as XLSX from 'xlsx';
 
+// Função para gerar dados fictícios
+const generateFakeData = () => {
+  const patients = [];
+  const startDate = new Date(2023, 0, 1);
+  
+  for (let i = 1; i <= 50; i++) {
+    patients.push({
+      id: i,
+      nome: `Paciente ${i}`,
+      idade: Math.floor(Math.random() * 50 + 18),
+      genero: Math.random() > 0.5 ? 'Masculino' : 'Feminino',
+      sintomas: {
+        febre: Math.random() > 0.7 ? 'SIM' : 'NAO',
+        tosse: Math.random() > 0.5 ? 'SIM' : 'NAO',
+        faltaDeAr: Math.random() > 0.8 ? 'SIM' : 'NAO'
+      },
+      dataRegistro: new Date(startDate.setDate(startDate.getDate() + 1)).toISOString().split('T')[0],
+      pressaoArterial: `${Math.floor(Math.random() * 30 + 100)}x${Math.floor(Math.random() * 20 + 70)}`,
+      temperatura: (Math.random() * 3 + 36).toFixed(1),
+      satO2: Math.floor(Math.random() * 10 + 90)
+    });
+  }
+  
+  return patients;
+};
+
 export default function DataExportPage() {
   const router = useRouter();
   const [format, setFormat] = useState('json');
 
-  const handleExport = async () => {
+  const handleExport = () => {
     try {
-      const res = await fetch('/api/export-data');
-      const data = await res.json();
+      const data = generateFakeData();
 
       if (format === 'json') {
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        downloadBlob(blob, 'dados_exportados.json');
+        downloadBlob(blob, 'dados_pacientes.json');
       }
 
       if (format === 'csv') {
         const csv = convertToCSV(data);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        downloadBlob(blob, 'dados_exportados.csv');
+        downloadBlob(blob, 'dados_pacientes.csv');
       }
 
       if (format === 'xlsx') {
         const worksheet = XLSX.utils.json_to_sheet(data);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Dados');
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Pacientes');
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
         const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-        downloadBlob(blob, 'dados_exportados.xlsx');
+        downloadBlob(blob, 'dados_pacientes.xlsx');
       }
     } catch (error) {
       console.error("Erro ao exportar dados:", error);
     }
   };
+
 
   const downloadBlob = (blob: Blob, filename: string) => {
     const url = window.URL.createObjectURL(blob);
@@ -49,12 +75,24 @@ export default function DataExportPage() {
 
   const convertToCSV = (data: any[]) => {
     if (!data || data.length === 0) return '';
+    
+    const flattenObject = (obj: any) => {
+      return Object.keys(obj).map(key => {
+        const value = obj[key];
+        return typeof value === 'object' ? JSON.stringify(value) : value;
+      });
+    };
 
     const headers = Object.keys(data[0]);
     const csvRows = [
-      headers.join(','), // cabeçalho
-      ...data.map(row => headers.map(field => `"${(row[field] ?? '').toString().replace(/"/g, '""')}"`).join(','))
+      headers.join(','),
+      ...data.map(row => 
+        flattenObject(row)
+          .map(field => `"${String(field ?? '').replace(/"/g, '""')}"`)
+          .join(',')
+      )
     ];
+    
     return csvRows.join('\n');
   };
 
@@ -96,7 +134,7 @@ export default function DataExportPage() {
 
           <button
             onClick={handleExport}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition w-full transition-all transform hover:scale-105 cursor-pointer"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition w-full"
           >
             Exportar Dados
           </button>
