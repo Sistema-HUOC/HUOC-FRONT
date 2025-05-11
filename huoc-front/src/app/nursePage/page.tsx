@@ -40,7 +40,7 @@ export default function PatientListPage() {
     {
       id: 1,
       name: 'Maria **** Santos',
-      cpf: '***.***.789-00',
+      cpf: '123.***.***-00',
       birthDate: '10/07/1985',
       record: '12345',
       age: '39',
@@ -56,7 +56,7 @@ export default function PatientListPage() {
     {
       id: 2,
       name: 'João **** Silva',
-      cpf: '***.***.321-00',
+      cpf: '987.***.***-20',
       birthDate: '25/03/1990',
       record: '54321',
       age: '35',
@@ -189,6 +189,7 @@ export default function PatientListPage() {
               <tr className="bg-gray-200 text-gray-900">
                 <th className="py-2 px-4">Nome</th>
                 <th className="py-2 px-4">Prontuário</th>
+                <th className="py-2 px-4">CPF</th>
                 <th className="py-2 px-4 text-center">Ações</th>
               </tr>
             </thead>
@@ -197,6 +198,7 @@ export default function PatientListPage() {
                 <tr key={patient.id} className="border-t border-gray-400 text-gray-600">
                   <td className="py-2 px-4">{patient.name}</td>
                   <td className="py-2 px-4">{patient.record}</td>
+                  <td className="py-2 px-4">{patient.cpf}</td>
                   <td className="py-2 px-4 text-center space-x-3">
                     <button 
                       title="Formulário de Sintomas" 
