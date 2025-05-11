@@ -1,9 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from "next/image";
-
-
 
 const tabs = [
   "Geral", "Respiratório", "Infeccioso / Inflamatório", "Cardiovascular",
@@ -12,7 +10,9 @@ const tabs = [
 
 export default function ClinicalForm() {
   const router = useRouter();
+  const searchParams = useSearchParams(); // Moved to top level
   const [activeTab, setActiveTab] = useState("Geral");
+  
   type FormSection = {
     [fieldKey: string]: string;
   };
@@ -22,7 +22,7 @@ export default function ClinicalForm() {
   };
   
   const [formData, setFormData] = useState<FormData>({});
-  
+  const [formStatus, setFormStatus] = useState<{ [tab: string]: 'salvo' | 'naoSalvo' }>({});
 
   const handleInputChange = (section: string, field: string, value: any) => {
     setFormData(prev => ({
@@ -118,31 +118,39 @@ export default function ClinicalForm() {
     ],
   };
 
-
   const handlePartialSave = () => {
     const sectionData = formData[activeTab];
-  
+    const patientId = searchParams.get('id');
+    
     if (!sectionData) {
       alert(`Nenhum dado preenchido na aba "${activeTab}".`);
       return;
     }
   
-    // Exemplo com localStorage
+    if (!patientId) {
+      alert("Paciente não identificado.");
+      return;
+    }
+  
     const savedData = JSON.parse(localStorage.getItem("clinicalFormData") || "{}");
+    
+    // Atualiza apenas os dados do paciente específico
     const updatedData = {
       ...savedData,
-      [activeTab]: sectionData
+      [patientId]: {
+        ...(savedData[patientId] || {}),
+        [activeTab]: sectionData
+      }
     };
-
-    // await fetch('/api/form', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(formData),
-    // });
   
     localStorage.setItem("clinicalFormData", JSON.stringify(updatedData));
-    alert(`Dados da aba "${activeTab}" salvos com sucesso!`);
-
+    
+    // Atualiza o status apenas da aba atual
+    setFormStatus(prev => ({
+      ...prev,
+      [activeTab]: 'salvo'
+    }));
+  
     const currentIndex = tabs.indexOf(activeTab);
     if (currentIndex < tabs.length - 1) {
       setActiveTab(tabs[currentIndex + 1]);
@@ -150,54 +158,85 @@ export default function ClinicalForm() {
       alert("Você chegou à última aba do formulário.");
     }
   };
-  
+
+  // Substitua o useEffect atual por este:
   useEffect(() => {
-    const saved = localStorage.getItem("clinicalFormData");
-    if (saved) {
-      setFormData(JSON.parse(saved));
+    const patientId = searchParams.get('id');
+    if (!patientId) return;
+
+    const savedData = localStorage.getItem("clinicalFormData");
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        const patientData = parsedData[patientId] || {};
+        
+        // Atualiza o formData com os dados do paciente específico
+        setFormData(patientData);
+
+        // Atualiza o formStatus baseado nos dados existentes
+        const newStatus: { [tab: string]: 'salvo' | 'naoSalvo' } = {};
+        tabs.forEach(tab => {
+          newStatus[tab] = patientData[tab] ? 'salvo' : 'naoSalvo';
+        });
+        setFormStatus(newStatus);
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+      }
+    } else {
+      // Inicializa todos os status como 'naoSalvo' se não houver dados
+      const initialStatus = tabs.reduce((acc, tab) => {
+        acc[tab] = 'naoSalvo';
+        return acc;
+      }, {} as { [tab: string]: 'salvo' | 'naoSalvo' });
+      setFormStatus(initialStatus);
     }
-  }, []);
+  }, [searchParams]);
 
 
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navbar */}
-            <header className="bg-[#BFDBFE] flex items-center justify-between px-6 py-4 shadow-md">
-              <div className="flex items-center gap-3">
-                <Image src="/huoc-system.png" alt="Logo HUOC" width={40} height={40} />
-                <h1 className="text-lg font-semibold text-gray-800">Formulário de Sintomatologia Clínica</h1>
-              </div>
-
-              <button
-                onClick={() => router.back()}
-                className="text-blue-700 hover:text-blue-900 font-semibold flex items-center gap-1 transition"
-                title="Voltar"
-              >
+      <header className="bg-[#BFDBFE] flex items-center justify-between px-6 py-4 shadow-md">
+        <div className="flex items-center gap-3">
+          <Image src="/huoc-system.png" alt="Logo HUOC" width={40} height={40} />
+          <h1 className="text-lg font-semibold text-gray-800">Formulário de Sintomatologia Clínica</h1>
+          </div>
+          <button
+              onClick={() => router.back()}
+              className="text-blue-700 mr-3 font-semibold flex items-center gap-1 transition-all transform hover:scale-105 cursor-pointer border-b-2 border-transparent hover:border-blue-700"
+              title="Voltar">
                 <i className="bi bi-arrow-left text-lg"></i>
                 <span>Voltar</span>
-              </button>
-            </header>
+          </button>
+      </header>
+      <main className="bg-[#BFDBFE] items-center justify-center px-4 border-t-1 border-b-1 border-gray-400"> 
+          {/* Tabs */}
+          <div className="flex flex-wrap gap-2 mb-4 text-black mt-1 justify-center mt-3">
+            {tabs.map(tab => {
+              const isActive = activeTab === tab;
+              const status = formStatus[tab] || 'naoSalvo';
+              const borderColor = status === 'salvo' ? 'border-b-4 border-green-300' : 'border-b-4 border-red-300';
+
+              return (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-2 rounded-lg ${isActive ? 'bg-blue-600 text-white' : 'bg-[#8abff9]'} ${borderColor}`}
+                >
+                  {tab}
+                </button>
+              );
+            })}
+          </div>
+      </main>
+      
 
       <main 
         className="flex-grow flex flex-col items-center justify-center bg-cover bg-bottom px-4"
         style={{ backgroundImage: "url('/bg.jpg')" }}
       >
-
-
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-2 mb-4 text-black mt-1">
-        {tabs.map(tab => (
-          <button
-          key={tab}
-          onClick={() => setActiveTab(tab)}
-          className={`px-4 py-2 rounded-lg ${activeTab === tab ? 'bg-blue-600 text-white' : 'bg-[#BFDBFE]'}`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
+      
       {/* Symptoms */}
       <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
       {(symptomList[activeTab] || []).map((symptom) => (
@@ -225,16 +264,25 @@ export default function ClinicalForm() {
               <span className="ml-1">Sim</span>
             </label>
 
+            
+
             {/* Campo de texto adicional */}
             {symptom.hasDetail && formData[activeTab]?.[symptom.key] === "Sim" && (
               <input
                 type="text"
+                inputMode="decimal"
+                pattern="^\d{2}(\.\d)?$"
+                maxLength={4}
                 placeholder={symptom.detailLabel}
                 className="border p-1 rounded"
                 value={formData[activeTab]?.[`${symptom.key}Detalhe`] || ""}
-                onChange={(e) =>
-                  handleInputChange(activeTab, `${symptom.key}Detalhe`, e.target.value)
-                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  // Aceita apenas até 2 dígitos, opcionalmente seguidos de ponto e 1 dígito decimal
+                  if (/^\d{0,2}(\.\d?)?$/.test(val)) {
+                    handleInputChange(activeTab, `${symptom.key}Detalhe`, val);
+                  }
+                }}
               />
             )}
 
@@ -278,7 +326,7 @@ export default function ClinicalForm() {
       </div>
 
       {/* Upload */}
-      {activeTab === "Psiquiátrico" && (
+      {activeTab === "Geral" && (
         <div className="mt-6">
           <label className="block font-medium mb-2 text-black">📎 Anexar exames/laboratório:</label>
           <input type="file" className="text-blue-700"/>
@@ -289,8 +337,7 @@ export default function ClinicalForm() {
       <div className="mt-6">
         <button
           onClick={handlePartialSave}
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-        >
+          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
           💾 Salvar "{activeTab}"
         </button>
       </div>
