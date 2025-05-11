@@ -75,7 +75,7 @@ export default function PatientRegisterPage() {
       >
         <form
           onSubmit={handleSubmit}
-          className="bg-white bg-opacity-70 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-4xl"
+          className="bg-white bg-opacity-70 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-4xl text-black"
         >
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Informações Básicas</h2>
 
