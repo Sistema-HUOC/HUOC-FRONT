@@ -5,12 +5,18 @@ import Image from 'next/image';
 interface Patient {
     id: number;
     name: string;
+    cpf: string;
+    birthDate: string;
     record: string;
-    avatar: string;
-    createdAt?: string;
-    registeredAt?: string;
-    lastAppointment?: string;
-    status: string;
+    age: string;
+    gender: string;
+    bloodType: string;
+    phone: string;
+    confirmationYear: string;
+    address: string;
+    city?: string;
+    state?: string;
+    email?: string;
 }
 
 interface Props {
@@ -21,9 +27,9 @@ interface Props {
     onView: (patient: Patient) => void;
 }
 
-export default function PatientList({ patients, search, setSearch, onEdit, onView }: Props) {
+export default function PatientCard({ patients, search, setSearch, onEdit, onView }: Props) {
     const filteredPatients = patients.filter(p =>
-        `${p.name} ${p.record}`.toLowerCase().includes(search.toLowerCase())
+        `${p.name} ${p.record} ${p.cpf}`.toLowerCase().includes(search.toLowerCase())
     );
 
     return (
@@ -31,7 +37,7 @@ export default function PatientList({ patients, search, setSearch, onEdit, onVie
             <div className="flex justify-between items-center mb-6">
                 <input
                     type="text"
-                    placeholder="Buscar por nome ou nº de prontuário"
+                    placeholder="Buscar por nome, prontuário ou CPF"
                     className="border border-gray-300 rounded-full px-4 py-2 w-full max-w-md text-gray-800"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -49,37 +55,32 @@ export default function PatientList({ patients, search, setSearch, onEdit, onVie
                         >
                             <div className="flex items-center gap-4">
                                 <Image
-                                    src={patient.avatar}
+                                    src={"/avatar01.png"}
                                     alt={`Avatar de ${patient.name}`}
-                                    width={100}
-                                    height={100}
-                                    className="rounded-full border border-gray-300"
+                                    width={80}
+                                    height={80}
+                                    className="rounded-full border border-gray-300 w-20 h-20 object-cover"
                                 />
                                 <div>
                                     <h2 className="text-lg font-semibold text-gray-800">{patient.name}</h2>
                                     <p className="text-sm text-gray-500">Prontuário: {patient.record}</p>
-                                    {patient.createdAt && (
-                                        <p className="text-xs text-gray-400">Cadastro: {patient.createdAt}</p>
-                                    )}
-                                    {patient.registeredAt && (
-                                        <p className="text-xs text-gray-400">Registrado: {patient.registeredAt}</p>
-                                    )}
-                                    {patient.lastAppointment && (
-                                        <p className="text-xs text-gray-400">Última consulta: {patient.lastAppointment}</p>
-                                    )}
+                                    <p className="text-sm text-gray-500">CPF: {patient.cpf}</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <i className={`bi ${patient.status === 'Novo' ? 'bi-star-fill text-blue-500' : 'bi-clock-fill text-yellow-500'}`}></i>
-                                <span className="text-sm font-medium text-black">{patient.status}</span>
-                            </div>
-
                             <div className="mt-auto flex justify-end gap-4">
-                                <button title="Editar Dados Médicos" onClick={() => onEdit(patient.id)}>
+                                <button 
+                                    title="Editar Dados Médicos" 
+                                    onClick={() => onEdit(patient.id)}
+                                    className="hover:bg-yellow-100 p-1 rounded-full"
+                                >
                                     <i className="bi bi-pencil-square text-yellow-600 hover:text-yellow-800 text-xl transition-transform hover:scale-105 cursor-pointer"></i>
                                 </button>
-                                <button title="Visualizar Paciente" onClick={() => onView(patient)}>
+                                <button 
+                                    title="Visualizar Paciente" 
+                                    onClick={() => onView(patient)}
+                                    className="hover:bg-green-100 p-1 rounded-full"
+                                >
                                     <i className="bi bi-eye-fill text-green-600 hover:text-green-800 text-xl transition-transform hover:scale-105 cursor-pointer"></i>
                                 </button>
                             </div>
