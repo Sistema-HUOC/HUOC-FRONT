@@ -212,10 +212,10 @@ export default function ClinicalForm() {
       </header>
 
       {/* Main Content */}
-      <div className="flex-grow" style={{ backgroundImage: "url('/bg.jpg')", backgroundSize: "cover", backgroundPosition: "bottom" }}>
-        <div className="container mx-auto px-4 py-6">
+      <div className="flex-grow bg-cover bg-bottom px-4 py-8 flex flex-col items-center" style={{ backgroundImage: "url('/bg.jpg')" }}>
+        <div className="max-w-4xl mx-auto w-full">
           {/* Tabs */}
-          <div className="flex flex-wrap gap-2 mb-4 text-black justify-center">
+          <div className="sticky top-0 z-10 w-full flex flex-wrap gap-2 text-black justify-center px-4 py-3">
             {tabs.map(tab => {
               const isActive = activeTab === tab;
               const status = formStatus[tab] || 'naoSalvo';
@@ -225,7 +225,7 @@ export default function ClinicalForm() {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-lg ${isActive ? 'bg-blue-600 text-white' : 'bg-[#8abff9]'} ${borderColor}`}
+                  className={`px-4 py-2 rounded-lg ${isActive ? 'bg-blue-600 text-white' : 'bg-[#8abff9]'} ${borderColor} transition duration-300 cursor-pointer`}
                 >
                   {tab}
                 </button>
@@ -234,102 +234,99 @@ export default function ClinicalForm() {
           </div>
 
           {/* Symptoms Form */}
-          <div className="bg-white p-6 rounded-lg shadow-md max-w-100 mx-auto mt-10">
-            {(symptomList[activeTab] || []).map((symptom) => (
-              <div key={symptom.key} className="space-y-2 text-black mb-4">
-                <label className="block font-medium">{symptom.label}</label>
-                <div className="flex items-center gap-4 text-gray-700 font-semibold text-sm">
-                  <label>
-                    <input
-                      type="radio"
-                      name={`${activeTab}-${symptom.key}`}
-                      value="Não"
-                      checked={formData[activeTab]?.[symptom.key] === "Não"}
-                      onChange={() => handleInputChange(activeTab, symptom.key, "Não")}
-                    />
-                    <span className="ml-1">Não</span>
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name={`${activeTab}-${symptom.key}`}
-                      value="Sim"
-                      checked={formData[activeTab]?.[symptom.key] === "Sim"}
-                      onChange={() => handleInputChange(activeTab, symptom.key, "Sim")}
-                    />
-                    <span className="ml-1">Sim</span>
-                  </label>
-
-                  {/* Campo de texto adicional */}
-                  {symptom.hasDetail && formData[activeTab]?.[symptom.key] === "Sim" && (
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      pattern="^\d{2}(\.\d)?$"
-                      maxLength={4}
-                      placeholder={symptom.detailLabel}
-                      className="border p-1 rounded"
-                      value={formData[activeTab]?.[`${symptom.key}Detalhe`] || ""}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (/^\d{0,2}(\.\d?)?$/.test(val)) {
-                          handleInputChange(activeTab, `${symptom.key}Detalhe`, val);
-                        }
-                      }}
-                    />
-                  )}
-
-                  {/* Opções adicionais */}
-                  {symptom.hasOptions &&
-                    formData[activeTab]?.[symptom.key] === "Sim" && (
-                      <div className="flex gap-2 ml-2">
-                        {symptom.hasOptions.map((opt: string) => (
-                          <label key={opt}>
-                            <input
-                              type="radio"
-                              name={`${activeTab}-${symptom.key}-type`}
-                              value={opt}
-                              checked={
-                                formData[activeTab]?.[`${symptom.key}Tipo`] === opt
-                              }
-                              onChange={() =>
-                                handleInputChange(activeTab, `${symptom.key}Tipo`, opt)
-                              }
-                            />
-                            <span className="ml-1">{opt}</span>
-                          </label>
-                        ))}
-                      </div>
+          <div className="flex flex-1 w-full justify-center items-start">
+            <div className="w-full max-w-2xl space-y-4 bg-white p-6 rounded-lg shadow-md mt-10">
+              {(symptomList[activeTab] || []).map((symptom) => (
+                <div key={symptom.key} className="grid gap-6 mb-4 text-black md:grid-cols-2 items-start">
+                  <label className="block font-medium ">{symptom.label}</label>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 gap-2 text-gray-700 font-semibold text-sm">
+                    <label>
+                      <input
+                        type="radio"
+                        name={`${activeTab}-${symptom.key}`}
+                        value="Não"
+                        checked={formData[activeTab]?.[symptom.key] === "Não"}
+                        onChange={() => handleInputChange(activeTab, symptom.key, "Não")}
+                      />
+                      <span className="ml-1">Não</span>
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name={`${activeTab}-${symptom.key}`}
+                        value="Sim"
+                        checked={formData[activeTab]?.[symptom.key] === "Sim"}
+                        onChange={() => handleInputChange(activeTab, symptom.key, "Sim")}
+                      />
+                      <span className="ml-1">Sim</span>
+                    </label>
+                    {/* Campo de texto adicional */}
+                    {symptom.hasDetail && formData[activeTab]?.[symptom.key] === "Sim" && (
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        pattern="^\d{2}(\.\d)?$"
+                        maxLength={4}
+                        placeholder={symptom.detailLabel}
+                        className="border p-1 rounded"
+                        value={formData[activeTab]?.[`${symptom.key}Detalhe`] || ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (/^\d{0,2}(\.\d?)?$/.test(val)) {
+                            handleInputChange(activeTab, `${symptom.key}Detalhe`, val);
+                          }
+                        }}
+                      />
                     )}
+                    {/* Opções adicionais */}
+                    {symptom.hasOptions &&
+                      formData[activeTab]?.[symptom.key] === "Sim" && (
+                        <div className="flex gap-2 ml-2">
+                          {symptom.hasOptions.map((opt: string) => (
+                            <label key={opt}>
+                              <input
+                                type="radio"
+                                name={`${activeTab}-${symptom.key}-type`}
+                                value={opt}
+                                checked={
+                                  formData[activeTab]?.[`${symptom.key}Tipo`] === opt
+                                }
+                                onChange={() =>
+                                  handleInputChange(activeTab, `${symptom.key}Tipo`, opt)
+                                }
+                              />
+                              <span className="ml-1">{opt}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                  </div>
                 </div>
-              </div>
-            ))}
-
-            {/* Observações */}
-            <div className="mb-6">
-              <label className="block font-medium text-black">📝 Observações adicionais:</label>
-              <textarea
-                rows={3}
-                className="w-full border p-2 rounded"
-                onChange={(e) => handleInputChange(activeTab, "observacoes", e.target.value)}
-              />
-            </div>
-
-            {/* Upload */}
-            {activeTab === "Geral" && (
+              ))}
+              {/* Observações */}
               <div className="mb-6">
-                <label className="block font-medium mb-2 text-black">📎 Anexar exames/laboratório:</label>
-                <input type="file" className="text-blue-700"/>
+                <label className="block font-medium text-black">📝 Observações adicionais:</label>
+                <textarea
+                  rows={3}
+                  className="w-full border p-2 rounded"
+                  onChange={(e) => handleInputChange(activeTab, "observacoes", e.target.value)}
+                />
               </div>
-            )}
-
-            <div className="text-center">
-              <button
-                onClick={handlePartialSave}
-                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-                💾 Salvar "{activeTab}"
-              </button>
-            </div>
+              {/* Upload */}
+              {activeTab === "Geral" && (
+                <div className="mb-6">
+                  <label className="block font-medium mb-2 text-black">📎 Anexar exames/laboratório:</label>
+                  <input type="file" className="text-blue-700"/>
+                </div>
+              )}
+              <div className="text-center">
+                <button
+                  onClick={handlePartialSave}
+                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-all transform hover:scale-105 cursor-pointer">
+                  💾 Salvar "{activeTab}"
+                </button>
+              </div>
+          </div>
           </div>
         </div>
       </div>
