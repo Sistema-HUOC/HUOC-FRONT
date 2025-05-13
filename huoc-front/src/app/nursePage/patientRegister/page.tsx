@@ -1,4 +1,3 @@
-// src/app/nursePage/patientRegister/page.tsx
 'use client';
 
 import { useState } from 'react';
@@ -39,15 +38,52 @@ export default function PatientRegisterPage() {
     }
   };
 
-
   const addHistoryEntry = () => {
     setForm({ ...form, history: [...form.history, { date: '', symptoms: '' }] });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validação dos campos obrigatórios
+    if (!form.name || !form.cpf || !form.birthDate || !form.gender) {
+      alert("Por favor, preencha todos os campos obrigatórios marcados com *");
+      return;
+    }
+
+    // Verificar campos não obrigatórios vazios
+    const optionalFields = [
+      { name: 'Número do Prontuário', value: form.recordNumber },
+      { name: 'Tipo Sanguíneo', value: form.bloodType },
+      { name: 'Telefone', value: form.phone },
+      { name: 'Diagnóstico', value: form.diagnosis },
+      { name: 'Ano de Confirmação', value: form.confirmationYear },
+      { name: 'Endereço', value: form.address },
+      ...form.history.map((entry, i) => ({
+        name: `Data da Consulta ${i + 1}`,
+        value: entry.date
+      })),
+      ...form.history.map((entry, i) => ({
+        name: `Sintomas da Consulta ${i + 1}`,
+        value: entry.symptoms
+      }))
+    ];
+
+    const emptyFields = optionalFields.filter(field => !field.value);
+    
+    if (emptyFields.length > 0) {
+      const fieldNames = emptyFields.map(f => f.name).join('\n• ');
+      const shouldContinue = confirm(`Os seguintes campos não foram preenchidos:\n\n• ${fieldNames}\n\nDeseja continuar mesmo assim?`);
+      
+      if (!shouldContinue) {
+        return;
+      }
+    }
+
     console.log('Dados do paciente:', form);
     // lógica de envio para o back-end
+    alert("Paciente cadastrado com sucesso!");
+    router.push('/nursePage');
   };
 
   return (
@@ -77,179 +113,148 @@ export default function PatientRegisterPage() {
           onSubmit={handleSubmit}
           className="bg-white bg-opacity-70 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-4xl text-black"
         >
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Informações Básicas</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Informações Básicas *</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <input
-              name="name"
-              placeholder="Nome Completo"
-              onChange={(e) => {
-                const rawValue = e.target.value.replace(/[^a-zA-Záéíóúãõâêîôûàèìòùç\s]/g, ""); // Remove tudo que não for letra ou espaço
+            {/* Nome Completo (Obrigatório) */}
+            <div>
+              <input
+                name="name"
+                placeholder="Nome Completo *"
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/[^a-zA-Záéíóúãõâêîôûàèìòùç\s]/g, "");
+                  e.target.value = rawValue;
+                  handleChange(e);
+                }}
+                value={form.name}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+            
+            {/* CPF (Obrigatório) */}
+            <div>
+              <input
+                name="cpf"
+                placeholder="CPF * (000.000.000-00)"
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/\D/g, "");
+                  const maskedValue = rawValue
+                    .replace(/(\d{3})(\d)/, "$1.$2")
+                    .replace(/(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+                    .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, "$1.$2.$3-$4")
+                    .slice(0, 14);
+                  e.target.value = maskedValue;
+                  handleChange(e);
+                }}
+                value={form.cpf}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
 
-                // Modifica o valor diretamente no e.target
-                e.target.value = rawValue;
+            {/* Data de Nascimento (Obrigatório) */}
+            <div>
+              <label className="block mb-1 ml-2 text-md font-medium text-gray-700">
+                Data de Nascimento *
+              </label>
+              <input 
+                type="date" 
+                name="birthDate" 
+                onChange={handleChange} 
+                value={form.birthDate}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+                aria-required="true"
+              />
+            </div>
 
-                // Chama handleChange com o evento real
-                handleChange(e);
-              }}
-              value={form.name}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <input
-              name="cpf"
-              placeholder="000.000.000-00"
-              onChange={(e) => {
-                const rawValue = e.target.value.replace(/\D/g, ""); // Remove não dígitos
-                const maskedValue = rawValue
-                  .replace(/^(\d{3})(\d)/, "$1.$2")
-                  .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-                  .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4")
-                  .slice(0, 14);
-
-                e.target.value = maskedValue; // ⬅️ aplica a máscara diretamente no event
-                handleChange(e); // ⬅️ envia o evento original
-              }}
-              value={form.cpf}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <input type="date" name="birthDate" onChange={handleChange} value={form.birthDate} className="input" />
-            <input
-              name="recordNumber"
-              placeholder="N° Prontuário"
-              onChange={(e) => {
-                const rawValue = e.target.value.replace(/\D/g, ""); // Remove tudo que não for número
-
-                e.target.value = rawValue; // Atualiza o valor com apenas números
-
-                handleChange(e); // Passa o evento real
-              }}
-              value={form.recordNumber}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <input
-              name="age"
-              placeholder="Idade"
-              onChange={(e) => {
-                const rawValue = e.target.value.replace(/\D/g, ""); // Remove tudo que não for número
-                const ageValue = rawValue.slice(0, 3); // Limita a idade a no máximo 3 dígitos (não permite mais de 120)
-
-                // Modifica o valor diretamente no e.target
-                e.target.value = ageValue;
-
-                // Chama handleChange com o evento real
-                handleChange(e);
-              }}
-              value={form.age}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <div className="flex justify-center gap-2 p-2">
-              <div>
-                <input
-                  className="peer sr-only"
-                  value="male"
-                  name="gender"
-                  id="male"
-                  type="radio"
-                />
-                <div
-                  className="flex h-16 w-24 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-gray-300 bg-gray-50 p-1 transition-transform duration-150 hover:border-blue-400 active:scale-95 peer-checked:border-blue-500 peer-checked:shadow-md peer-checked:shadow-blue-400"
-                >
-                  <label
-                    className="flex cursor-pointer items-center justify-center text-sm uppercase text-gray-500 peer-checked:text-blue-500"
-                    htmlFor="male"
-                  >
-                    <svg
-                      viewBox="0 0 100000 100000"
-                      text-rendering="geometricPrecision"
-                      shape-rendering="geometricPrecision"
-                      image-rendering="optimizeQuality"
-                      clip-rule="evenodd"
-                      fill-rule="evenodd"
-                      className="h-8 w-8 fill-current peer-checked:fill-blue-500"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M35927 32903c412,2646 927,5119 1312,6767 -1320,-1159 -6849,-6682 -6569,-1799 342,5954 5284,6851 5297,6853l826 176 0 841c0,18 -115,6164 5054,8983 2585,1411 5371,2117 8155,2117 2783,0 5567,-706 8152,-2117 5169,-2819 5054,-8965 5054,-8983l0 -841 826 -176c13,-2 4955,-899 5297,-6853 273,-4760 -5035,428 -6400,1585 466,-2425 1265,-6640 1627,-10534 -707,-1139 -1761,-2058 -3310,-2445 -5841,-1459 -12802,2359 -14487,-898 -1685,-3256 -4043,-5728 -4043,-5728 0,0 -1461,5389 -4266,7749 -1302,1095 -2073,3278 -2525,5303zm7891 26143c0,0 -2213,3386 -2734,5600 -521,2213 -16015,783 -16407,9375 -392,8593 -391,16666 -391,16666l51429 0c0,0 1,-8073 -391,-16666 -392,-8592 -15886,-7162 -16407,-9375 -520,-2214 -2734,-5600 -2734,-5600 89,59 -103,-469 -339,-1065 1123,-370 2228,-847 3303,-1433 5035,-2746 5946,-8013 6109,-10011 1747,-593 5810,-2604 6152,-8552 329,-5738 -2626,-5167 -4942,-3884 588,-3342 1229,-9312 59,-16047 -1797,-10330 -8310,-7860 -13363,-8645 -5054,-786 -11791,3480 -11791,3480 0,0 -6064,-785 -8872,4717 -1830,3589 -79,10904 1361,15557l178 1232c-2363,-1457 -5799,-2573 -5444,3590 341,5948 4404,7959 6151,8552 163,1998 1075,7265 6110,10011 1074,586 2179,1063 3302,1433 -236,596 -428,1124 -339,1065zm11413 -875c37,1566 129,3813 367,5042 391,2019 -326,4297 -326,4297l-5271 5389 -5272 -5389c0,0 -717,-2278 -326,-4297 238,-1229 330,-3475 367,-5042 1719,502 3476,753 5232,753 1755,0 3511,-251 5229,-753z"
-                      ></path>
-                    </svg>
-                    Homem
-                  </label>
-                </div>
-              </div>
-              <div>
-                <input
-                  className="peer sr-only"
-                  value="female"
-                  name="gender"
-                  id="female"
-                  type="radio"
-                />
-                <div
-                  className="flex h-16 w-24 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-gray-300 bg-gray-50 p-1 transition-transform duration-150 hover:border-blue-400 active:scale-95 peer-checked:border-blue-500 peer-checked:shadow-md peer-checked:shadow-blue-400"
-                >
-                  <label
-                    className="flex cursor-pointer items-center justify-center text-sm uppercase text-gray-500 peer-checked:text-blue-500"
-                    htmlFor="female"
-                  >
-                    <svg
-                      id="female"
-                      viewBox="0 0 128 128"
-                      className="h-7 w-6 fill-gray-100"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M64,72.7c0,0,0-0.1,0-0.1c0,0,0,0,0,0V72.7z"
-                        fill="#000"
-                      ></path>
-                      <path
-                        d="M54.6 49.2c.7 0 1.4-.3 1.9-.8.5-.5.8-1.2.8-1.9s-.3-1.4-.8-1.9c-.5-.5-1.2-.8-1.9-.8-.7 0-1.4.3-1.9.8-.5.5-.8 1.2-.8 1.9 0 .7.3 1.4.8 1.9C53.2 48.9 53.9 49.2 54.6 49.2zM73.8 49.2c.7 0 1.4-.3 1.9-.8.5-.5.8-1.2.8-1.9s-.3-1.4-.8-1.9c-.5-.5-1.2-.8-1.9-.8s-1.4.3-1.9.8c-.5.5-.8 1.2-.8 1.9s.3 1.4.8 1.9C72.5 48.9 73.1 49.2 73.8 49.2z"
-                        fill="#000"
-                      ></path>
-                      <path
-                        d="M40.6 78.1h10.7V67.1c3.7 2.4 8.1 3.7 12.5 3.7v0c0 0 .1 0 .1 0 0 0 .1 0 .1 0v0c4.4 0 8.8-1.3 12.5-3.7v11.1h10.7c.2 0 .4 0 .6 0h8.3V34.4c0-17.8-14.4-32.2-32.1-32.3v0c0 0-.1 0-.1 0 0 0-.1 0-.1 0v0C46.2 2.2 31.8 16.7 31.8 34.4v43.7H40C40.2 78.1 40.4 78.1 40.6 78.1zM44 38.1c0-3.2 2.6-5.8 5.8-5.8h14.1.2 14.1c3.2 0 5.8 2.6 5.8 5.8v9.1c0 4.5-1.5 8.6-4 12-1 1.3-2.2 2.6-3.4 3.6-3.4 2.8-7.8 4.5-12.6 4.5-4.8 0-9.2-1.7-12.6-4.5-1.3-1.1-2.5-2.3-3.4-3.6-2.5-3.4-4-7.5-4-12V38.1zM116.8 123.3c-.9-5.2-3-16.3-3.5-17.8-2.3-7-8.2-10.4-14.5-13-.8-.3-1.6-.7-2.4-1-5.5-2.1-11-4.3-16.5-6.4-2.6 6.2-8.8 10.5-15.9 10.5s-13.3-4.3-15.9-10.5c-5.5 2.1-11 4.3-16.5 6.4-.8.3-1.6.6-2.4 1-6.3 2.6-12.1 6-14.5 13-.5 1.4-2.5 12.6-3.5 17.8-.2 1 .3 1.9 1.1 2.3.3.2.7.3 1.1.3h101.1c.4 0 .8-.1 1.1-.3C116.5 125.1 116.9 124.2 116.8 123.3z"
-                        className="fill-current"
-                      ></path>
-                    </svg>
-                    Mulher
-                  </label>
-                </div>
+            {/* Gênero (Obrigatório) */}
+            <div className="w-full ml-2">
+              <span className="block mb-1 font-medium text-gray-700">Gênero *</span>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Masculino"
+                    checked={form.gender === "Masculino"}
+                    onChange={handleChange}
+                    className="form-radio text-blue-600 focus:ring-blue-500"
+                    required
+                  />
+                  <span>Masculino</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Feminino"
+                    checked={form.gender === "Feminino"}
+                    onChange={handleChange}
+                    className="form-radio text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>Feminino</span>
+                </label>
               </div>
             </div>
-            <select
-              name="bloodType"
-              onChange={handleChange}
-              value={form.bloodType}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Selecione o tipo sanguíneo</option>
-              <option value="A+">A+</option>
-              <option value="A-">A−</option>
-              <option value="B+">B+</option>
-              <option value="B-">B−</option>
-              <option value="AB+">AB+</option>
-              <option value="AB-">AB−</option>
-              <option value="O+">O+</option>
-              <option value="O-">O−</option>
-            </select>
-            <input
-              name="phone"
-              placeholder="(00) 00000-0000"
-              onChange={(e) => {
-                const rawValue = e.target.value.replace(/\D/g, ""); // Remove tudo que não for número
 
-                const maskedValue = rawValue
-                  .replace(/^(\d{2})(\d)/, "($1) $2")           // (81) 
-                  .replace(/^(\(\d{2}\))\s(\d{5})(\d)/, "$1 $2-$3") // (81) 91234-567
+            {/* Número do Prontuário (Opcional) */}
+            <div>
+              <input
+                name="recordNumber"
+                placeholder="N° Prontuário"
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/\D/g, "");
+                  e.target.value = rawValue;
+                  handleChange(e);
+                }}
+                value={form.recordNumber}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
 
-                  .slice(0, 15); // Limita ao tamanho máximo
+            {/* Tipo Sanguíneo (Opcional) */}
+            <div>
+              <select
+                name="bloodType"
+                onChange={handleChange}
+                value={form.bloodType}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Tipo Sanguíneo</option>
+                <option value="A+">A+</option>
+                <option value="A-">A−</option>
+                <option value="B+">B+</option>
+                <option value="B-">B−</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB−</option>
+                <option value="O+">O+</option>
+                <option value="O-">O−</option>
+              </select>
+            </div>
 
-                e.target.value = maskedValue;
-                handleChange(e);
-              }}
-              value={form.phone}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <div className="w-full">
+            {/* Telefone (Opcional) */}
+            <div>
+              <input
+                name="phone"
+                placeholder="Telefone ((00) 00000-0000)"
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/\D/g, "");
+                  const maskedValue = rawValue
+                    .replace(/^(\d{2})(\d)/, "($1) $2")
+                    .replace(/^(\(\d{2}\))\s(\d{5})(\d)/, "$1 $2-$3")
+                    .slice(0, 15);
+                  e.target.value = maskedValue;
+                  handleChange(e);
+                }}
+                value={form.phone}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            {/* Diagnóstico Confirmado (Opcional) */}
+            <div className="w-full ml-2">
               <span className="block mb-1 font-medium text-gray-700">Diagnóstico Confirmado?</span>
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2">
@@ -276,23 +281,25 @@ export default function PatientRegisterPage() {
                 </label>
               </div>
             </div>
-            <input
-              name="confirmationYear"
-              placeholder="Ano de Confirmação"
-              onChange={(e) => {
-                const rawValue = e.target.value.replace(/\D/g, ""); // Remove tudo que não for número
-                const yearValue = rawValue.slice(0, 4); // Limita a 4 dígitos (formato de ano)
 
-                e.target.value = yearValue;
-                handleChange(e); // Usa o evento original
-              }}
-              value={form.confirmationYear}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+            {/* Ano de Confirmação (Opcional) */}
+            <div>
+              <input
+                name="confirmationYear"
+                placeholder="Ano de Confirmação do Diagnóstico"
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/\D/g, "");
+                  const yearValue = rawValue.slice(0, 4);
+                  e.target.value = yearValue;
+                  handleChange(e);
+                }}
+                value={form.confirmationYear}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            {/* Endereço (Opcional) */}
             <div className="col-span-2">
-              {/* <label htmlFor="address" className="block mb-1 font-medium text-gray-700">
-                Endereço
-              </label> */}
               <textarea
                 name="address"
                 placeholder="Endereço completo"
@@ -304,6 +311,7 @@ export default function PatientRegisterPage() {
             </div>
           </div>
 
+          {/* Histórico de Sintomas (Opcional) */}
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Histórico de Sintomas</h2>
           {form.history.map((entry, i) => (
             <div key={i} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -312,23 +320,40 @@ export default function PatientRegisterPage() {
                 name={`history.date`}
                 value={entry.date}
                 onChange={(e) => handleChange(e, i)}
-                className="input"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
               <textarea
                 name={`history.symptoms`}
                 placeholder="Sintomas clínicos observados"
                 value={entry.symptoms}
                 onChange={(e) => handleChange(e, i)}
-                className="input h-24"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                rows={3}
               />
             </div>
           ))}
-          <button type="button" onClick={addHistoryEntry} className="mb-6 text-blue-600 hover:underline">
-            + Adicionar nova consulta
+          <button 
+            type="button" 
+            onClick={addHistoryEntry} 
+            className="mb-6 text-blue-600 hover:underline flex items-center gap-1"
+          >
+            <i className="bi bi-plus-circle"></i>
+            Adicionar nova consulta
           </button>
 
-          <div className="flex justify-end">
-            <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full shadow transition-all transform hover:scale-105 cursor-pointer">
+          <div className="flex justify-end gap-4">
+            <button 
+              type="button"
+              onClick={() => router.push('/nursePage')}
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-6 py-3 rounded-full shadow transition-all"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full shadow transition-all transform hover:scale-105 cursor-pointer"
+            >
+              <i className="bi bi-save mr-2"></i>
               Salvar Cadastro
             </button>
           </div>
@@ -342,6 +367,3 @@ export default function PatientRegisterPage() {
     </div>
   );
 }
-
-// Estilo para inputs
-const inputClassName = "input"; // Use como classe utilitária global se quiser
