@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from "next/image";
+import { color } from 'chart.js/helpers';
 
 const tabs = [
   "Geral", "Respiratório", "Infeccioso / Inflamatório", "Cardiovascular",
@@ -238,7 +239,7 @@ export default function ClinicalForm() {
             <div className="w-full max-w-2xl space-y-4 bg-white p-6 rounded-lg shadow-md mt-10">
               {(symptomList[activeTab] || []).map((symptom) => (
                 <div key={symptom.key} className="grid gap-6 mb-4 text-black md:grid-cols-2 items-start">
-                  <label className="block font-medium ">{symptom.label}</label>
+                  <label className="block font-medium ">{symptom.label}<span className='text-red-500 ml-1'>*</span></label>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 gap-2 text-gray-700 font-semibold text-sm">
                     <label>
                       <input
@@ -247,6 +248,7 @@ export default function ClinicalForm() {
                         value="Não"
                         checked={formData[activeTab]?.[symptom.key] === "Não"}
                         onChange={() => handleInputChange(activeTab, symptom.key, "Não")}
+                        required
                       />
                       <span className="ml-1">Não</span>
                     </label>
@@ -257,6 +259,7 @@ export default function ClinicalForm() {
                         value="Sim"
                         checked={formData[activeTab]?.[symptom.key] === "Sim"}
                         onChange={() => handleInputChange(activeTab, symptom.key, "Sim")}
+                        required
                       />
                       <span className="ml-1">Sim</span>
                     </label>
@@ -270,10 +273,29 @@ export default function ClinicalForm() {
                         placeholder={symptom.detailLabel}
                         className="border p-1 rounded"
                         value={formData[activeTab]?.[`${symptom.key}Detalhe`] || ""}
+                        required
                         onChange={(e) => {
                           const val = e.target.value;
-                          if (/^\d{0,2}(\.\d?)?$/.test(val)) {
+                          
+                          // Permite digitação livre (apenas valida formato)
+                          if (/^\d{0,2}(\.\d{0,1})?$/.test(val)) {
                             handleInputChange(activeTab, `${symptom.key}Detalhe`, val);
+                          }
+                        }}
+                        onBlur={(e) => {
+                          // Validação final apenas ao sair do campo
+                          const numericValue = parseFloat(e.target.value);
+                          
+                          if (!isNaN(numericValue)) {
+                            if (numericValue < 35 || numericValue > 42) {
+                              alert("Valor clínico inválido!\nFaixa aceitável: 35.0°C a 42.0°C");
+                              // Opcional: Limpar campo inválido
+                              handleInputChange(activeTab, `${symptom.key}Detalhe`, "");
+                            } else {
+                              // Formatação automática
+                              const formattedValue = numericValue.toFixed(1);
+                              handleInputChange(activeTab, `${symptom.key}Detalhe`, formattedValue);
+                            }
                           }
                         }}
                       />
@@ -286,6 +308,7 @@ export default function ClinicalForm() {
                             <label key={opt}>
                               <input
                                 type="radio"
+                                required
                                 name={`${activeTab}-${symptom.key}-type`}
                                 value={opt}
                                 checked={
@@ -320,11 +343,35 @@ export default function ClinicalForm() {
                 </div>
               )}
               <div className="text-center">
-                <button
-                  onClick={handlePartialSave}
-                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-all transform hover:scale-105 cursor-pointer">
-                  💾 Salvar "{activeTab}"
-                </button>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  
+                  // Validação de campos obrigatórios
+                  const isValid = (symptomList[activeTab] || []).every(symptom => {
+                    const value = formData[activeTab]?.[symptom.key];
+                    
+                    // Verifica se o radio foi selecionado
+                    if (value === undefined) return false;
+                    
+                    // Verifica detalhes se for Sim
+                    if (value === "Sim" && symptom.hasDetail) {
+                      return !!formData[activeTab]?.[`${symptom.key}Detalhe`];
+                    }
+                    
+                    return true;
+                  });
+
+                  if (!isValid) {
+                    alert("Preencha todos os campos obrigatórios antes de salvar!");
+                    return;
+                  }
+
+                  handlePartialSave();
+                }}
+                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-all transform hover:scale-105 cursor-pointer">
+                💾 Salvar "{activeTab}"
+              </button>
               </div>
           </div>
           </div>

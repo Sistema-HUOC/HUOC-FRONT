@@ -43,7 +43,7 @@ export default function PatientListPage() {
       cpf: '123.***.***-00',
       birthDate: '10/07/1985',
       record: '12345',
-      age: '39',
+      age: '39 Anos, 10 meses, 8 Dias',
       gender: 'Feminino',
       phone: '(11) 91234-5678',
       email: 'maria.silva@example.com',
@@ -59,7 +59,7 @@ export default function PatientListPage() {
       cpf: '987.***.***-20',
       birthDate: '25/03/1990',
       record: '54321',
-      age: '35',
+      age: '35 anos, 1 mês, 19 dias',
       gender: 'Masculino',
       phone: '(21) 99876-5432',
       email: 'joao.lucas@example.com',
@@ -246,9 +246,7 @@ export default function PatientListPage() {
               <p><strong>Idade:</strong> {selectedPatient.age}</p>
               <p><strong>Gênero:</strong> {selectedPatient.gender}</p>
               <p><strong>Tipo Sanguíneo:</strong> {selectedPatient.bloodType}</p>
-              <p><strong>Telefone:</strong> {selectedPatient.phone}</p>
               <p><strong>Ano de Confirmação:</strong> {selectedPatient.confirmationYear}</p>
-              <p className="md:col-span-2 lg:col-span-3"><strong>Endereço:</strong> {selectedPatient.address}</p>
             </div>
 
             {/* Clinical Data */}
