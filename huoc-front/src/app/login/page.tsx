@@ -46,6 +46,11 @@ export default function LoginPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
+      // Se o usuário ainda não aceitou os termos, redireciona para /terms
+      if (!data.user.acceptedTerms) {
+        router.push("/terms");
+        return;
+      }
 
       // Redirecionamento baseado no email
       switch (data.user.email) {
