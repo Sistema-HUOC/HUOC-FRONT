@@ -51,28 +51,45 @@ export default function TermsPage() {
 
         <div className="h-96 overflow-y-scroll p-6 border border-gray-300 rounded-lg mb-6 bg-gray-50 text-justify text-gray-700 leading-relaxed text-base scrollbar-thin scrollbar-thumb-cyan-500 scrollbar-track-gray-200">
           <p className="mb-4"><strong>1. Introdução</strong></p>
-          <p className="mb-4">Esta Política de Privacidade tem como objetivo informar como seus dados serão coletados, utilizados e protegidos no âmbito da pesquisa acadêmica conduzida por [Nome da Instituição/Grupo de Pesquisa]...</p>
+          <p className="mb-4">Esta Política de Privacidade tem como objetivo informar como seus dados serão coletados, utilizados e protegidos no âmbito da pesquisa acadêmica conduzida pela Universidade de Pernambuco. Nos comprometemos com a segurança e privacidade das informações fornecidas, conforme as normas da <strong>Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709/2018)</strong>.</p>
 
           <p className="mb-4"><strong>2. Dados Coletados</strong></p>
-          <p className="mb-4">Durante a pesquisa, poderemos coletar informações clínicas, dados demográficos e outros dados relevantes. Sempre que possível, os dados serão anonimizados...</p>
+          <p className="mb-4">Durante a pesquisa, poderemos coletar os seguintes dados pessoais e/ou sensíveis:</p>
+          <p className="mb-4">1.	Informações clínicas (como diagnósticos, exames, histórico médico);</p>
+          <p className="mb-4">2.	Dados demográficos (idade, gênero, etc.);</p>
+          <p className="mb-4">3.	Outros dados relevantes para a pesquisa. </p>
+          <p className="mb-4">Sempre que possível, utilizaremos dados anonimizados, impossibilitando a identificação direta dos participantes.</p>
 
-          <p className="mb-4"><strong>3. Finalidade</strong></p>
-          <p className="mb-4">Os dados serão utilizados exclusivamente para fins acadêmicos e de pesquisa científica, análise estatística e aprimoramento de práticas médicas...</p>
+          <p className="mb-4"><strong>3. Finalidade do Tratamento dos Dados</strong></p>
+          <p className="mb-4">Os dados coletados serão utilizados exclusivamente para fins acadêmicos e de pesquisa, incluindo:</p>
+          <p className="mb-4">1.	Análise estatística e estudos epidemiológicos;</p>
+          <p className="mb-4">2.	Desenvolvimento de artigos e publicações científicas;</p>
+          <p className="mb-4">3.	Aprimoramento de práticas médicas com fins de padronização de prontuários dos pacientes, avanço do conhecimento científico e melhorar o acompanhamento ao longo das consultas.</p>
 
-          <p className="mb-4"><strong>4. Base Legal</strong></p>
-          <p className="mb-4">Nos baseamos no Art. 7º da LGPD. Caso os dados não sejam anonimizáveis, solicitaremos consentimento do titular...</p>
+          <p className="mb-4"><strong>4. Base Legal para o Tratamento</strong></p>
+          <p className="mb-4">O tratamento dos dados é realizado com fundamento no <strong>Art. 7º, IV da LGPD</strong>, que permite a utilização de dados pessoais para a <strong>realização de estudos por órgãos de pesquisa</strong>. Caso os dados não possam ser anonimizados, poderá ser solicitado o <strong>consentimento do titular (Art. 7º, I da LGPD)</strong>.</p>
 
-          <p className="mb-4"><strong>5. Compartilhamento</strong></p>
-          <p className="mb-4">Os dados não serão compartilhados fora do escopo da pesquisa, exceto se exigido legalmente ou com parceiros que garantam segurança...</p>
+          <p className="mb-4"><strong>5. Compartilhamento de Dados</strong></p>
+          <p className="mb-4">Os dados não serão compartilhados com terceiros fora do escopo da pesquisa, exceto:</p>
+          <p className="mb-4">1.	Quando exigido por obrigação legal;</p>
+          <p className="mb-4">2.	Com instituições parceiras que participem da pesquisa, garantindo a segurança e sigilo das informações.</p>
 
-          <p className="mb-4"><strong>6. Armazenamento</strong></p>
-          <p className="mb-4">Dados armazenados em ambiente seguro, com criptografia e acesso restrito a pesquisadores autorizados...</p>
+          <p className="mb-4"><strong>6. Armazenamento e Proteção dos Dados</strong></p>
+          <p className="mb-4">Os dados serão armazenados em ambiente seguro e protegidos contra acessos não autorizados. Medidas de segurança incluem:</p>
+          <p className="mb-4">1.	Criptografia e controle de acesso;</p>
+          <p className="mb-4">2.	Restrição de uso apenas por pesquisadores autorizados.</p>
 
           <p className="mb-4"><strong>7. Direitos dos Titulares</strong></p>
-          <p className="mb-4">Você pode solicitar acesso, correção ou exclusão de seus dados, além de revogar o consentimento, conforme a LGPD...</p>
+          <p className="mb-4">Os participantes da pesquisa podem exercer seus direitos previstos na LGPD, incluindo:</p>
+          <p className="mb-4">1.	Solicitar acesso aos seus dados;</p>
+          <p className="mb-4">2.	Corrigir informações incorretas;</p>
+          <p className="mb-4">3.	Revogar consentimento (quando aplicável);</p>
+          <p className="mb-4">4.	Solicitar a exclusão dos dados pessoais.</p>
 
           <p className="mb-4"><strong>8. Contato</strong></p>
-          <p className="mb-4">Dúvidas? Fale conosco via e-mail: <a className="text-cyan-700 underline" href="mailto:olimpico@palmares.ifpe.edu.br">olimpico@palmares.ifpe.edu.br</a></p>
+          <p className="mb-4">Perguntas, comentários ou reclamações sobre está Política entre em contato conosco através do e-mail: <a className="text-cyan-700 underline" href="mailto:olimpico@palmares.ifpe.edu.br">olimpico@palmares.ifpe.edu.br</a></p>
+
+          <p className="mb-4">Esta Política de Privacidade pode ser atualizada conforme necessário.</p>
 
           <p className="text-sm text-gray-500">Instituto Federal de Pernambuco — 30/03/2025</p>
         </div>
