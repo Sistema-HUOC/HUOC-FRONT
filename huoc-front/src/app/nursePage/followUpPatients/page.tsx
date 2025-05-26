@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import PatientCard from '@/components/patientCard/PatientCardDoctor';
+import PatientCard from '@/components/patientCard/PatientCardNurse';
 
 type Patient = {
     id: number;

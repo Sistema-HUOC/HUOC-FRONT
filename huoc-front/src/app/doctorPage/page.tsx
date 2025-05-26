@@ -81,19 +81,27 @@ export default function DoctorHome() {
             Olá, {userName}! Você está acessando a área de médicos do Sistema HUOC.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => router.push("/doctorPage/newPatients")}
-              className="bg-green-600 hover:bg-green-700 text-white text-lg font-semibold py-4 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 cursor-pointer"
+              className="bg-green-600 hover:bg-green-700 text-white text-md font-semibold py-4 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 cursor-pointer"
             >
               Pacientes Novos
             </button>
 
             <button
               onClick={() => router.push("/doctorPage/followUpPatients")}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold py-4 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 cursor-pointer"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white text-md font-semibold py-4 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 cursor-pointer"
             >
               Em Acompanhamento
+            </button>
+
+            <button
+              onClick={() => router.push('/doctorPage/patientRegister')}
+              className="bg-blue-600 hover:bg-blue-700 text-white text-md font-semibold py-4 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 cursor-pointer"
+              title="Adicionar Paciente">
+              <i className="bi bi-person-plus-fill text-lg"></i>
+              <span>Cadastrar Paciente</span>
             </button>
           </div>
         </div>
