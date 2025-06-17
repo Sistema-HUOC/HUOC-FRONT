@@ -12,14 +12,25 @@ export default function AdminHome() {
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
+        console.log("Dados do ParsedUser: ", parsedUser);
         setUserName(parsedUser.name || "Usuário");
       } catch {
         setUserName("Usuário");
       }
+    } else {
+      setUserName("Usuário");
     }
   }, []);
 
   return (
+
+    // Adc a tabela e funções de managerPage.html do CRM para cá, 
+    // ajustando para o Nextjs...
+    // Para as funções da API:
+    //  /api/adm -> Registro de ADM
+    //  /api/adm/pesquisador -> Administrador cria Pesquisador(a)
+    //  /api/admi/enfermeiro -> Administrador cria Enfermeiro(a)
+
     <div
       className="relative flex flex-col items-center justify-center min-h-screen bg-cover bg-bottom px-4"
       style={{ backgroundImage: "url('/bg.jpg')" }}
