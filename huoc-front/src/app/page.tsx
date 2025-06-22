@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -8,7 +9,7 @@ export default function Home() {
     >
       {/* Div maior com classe personalizada */}
       <div className="container-home1 mb-6">
-        
+
         {/* Div interna com classe personalizada */}
         <div className="container-home2">
           <div className="w-full text-center">
@@ -16,9 +17,14 @@ export default function Home() {
             <p className="text-content2 text-md mb-6">Otimizamos a gestão e armazenamento de dados clínicos.</p>
 
             <div className="flex justify-center mb-6">
-              <img src="/huoc-system.png" alt="Ícone HUOC" className="h-12" />
+              <Image
+                src="/huoc-system.png"
+                alt="Ícone HUOC"
+                width={48}
+                height={48}
+              />
             </div>
-
+            
             <Link href="/login">
               <button className="w-full sm:w-2/3 md:w-1/2 lg:w-1/2 bg-cyan-600 hover:bg-cyan-800 text-white py-2 px-4 rounded-full transition duration-300 cursor-pointer">
                 <strong><i className="bi bi-box-arrow-in-right"></i> Login</strong>
@@ -27,7 +33,7 @@ export default function Home() {
 
           </div>
         </div>
-        
+
       </div>
     </div>
   );
