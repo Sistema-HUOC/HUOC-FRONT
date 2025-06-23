@@ -17,14 +17,14 @@ app.use(express.json());
 app.use("/proxy/api", async (req, res) => {
   try {
     const targetPath = req.originalUrl.replace("/proxy", "");
-    const targetUrl = `http://localhost:8078${targetPath}`;
+    const targetUrl = `http://localhost:8080${targetPath}`;
     console.log(`🔁 Proxying ${req.method} -> ${targetUrl}`);
 
     const response = await fetch(targetUrl, {
       method: req.method,
       headers: {
         ...req.headers,
-        host: "localhost:8078",
+        host: "localhost:8080",
       },
       body:
         ["GET", "HEAD"].includes(req.method.toUpperCase()) ||

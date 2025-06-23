@@ -57,7 +57,7 @@ export default function AdminHome() {
             />
           </div>
           <h2 className="text-content1 text-2xl font-bold mb-2">
-            Olá, {userName}!
+            Olá {userName}, bem vindo de volta!
           </h2>
 
           <div className="mt-2">
