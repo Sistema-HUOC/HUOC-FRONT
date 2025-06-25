@@ -3,21 +3,197 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import LogoutButton from "@/components/logoutButton/logoutButton";
+import { accessEndpointMap, AccessLevel } from "./access";
+import React from "react";
 
-type Patient = {
-  id: number;
-  nome: string;
-  nascimento: string;
-  cpf: string;
-  email: string;
-};
+/* -------------------------------------------------------------------------- */
+/*  DATA / UTIL                                                               */
+/* -------------------------------------------------------------------------- */
+
+const accessOptions = [
+  { value: "ADMINISTRADOR", label: "Administrador" },
+  { value: "MEDICO", label: "Médico" },
+  { value: "ENFERMAGEM", label: "Enfermeiro" },
+  { value: "PESQUISADOR", label: "Pesquisador" },
+];
+
+/* -------------------------------------------------------------------------- */
+/*  EXTRA FIELDS COMPONENT                                                    */
+/* -------------------------------------------------------------------------- */
+
+function ExtraFields({ level }: { level: AccessLevel }) {
+  switch (level) {
+    case "MEDICO":
+      return (
+        <>
+          <div className="mb-3">
+            <label className="block text-gray-700">CRM</label>
+            <input
+              name="crm"
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded text-gray-500"
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="block text-gray-700">
+              Especializações (vírgulas)
+            </label>
+            <input
+              name="especializacoes"
+              type="text"
+              placeholder="Clínica, Cardiologia…"
+              className="w-full p-2 border border-gray-300 rounded text-gray-500"
+            />
+          </div>
+        </>
+      );
+
+    case "ENFERMAGEM":
+      return (
+        <div className="mb-3">
+          <label className="block text-gray-700">COREN</label>
+          <input
+            name="coren"
+            type="text"
+            className="w-full p-2 border border-gray-300 rounded text-gray-500"
+            required
+          />
+        </div>
+      );
+
+    case "PESQUISADOR":
+      return (
+        <>
+          <div className="mb-3">
+            <label className="block text-gray-700">Instituição (ID)</label>
+            <input
+              name="idInstituicao"
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded text-gray-500"
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="block text-gray-700">
+              Áreas de Atuação (IDs, vírgulas)
+            </label>
+            <input
+              name="idAreasAtuacao"
+              type="text"
+              placeholder="id1,id2,id3"
+              className="w-full p-2 border border-gray-300 rounded text-gray-500"
+            />
+          </div>
+        </>
+      );
+
+    default:
+      return null; // ADMINISTRADOR não tem extras
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  COMMON FIELDS (nome, cpf, etc.)                                           */
+/* -------------------------------------------------------------------------- */
+
+function CommonFields() {
+  return (
+    <>
+      <div className="mb-3">
+        <label className="block text-gray-700">Nome</label>
+        <input
+          name="nome"
+          type="text"
+          className="w-full p-2 border border-gray-300 rounded text-gray-500"
+          required
+        />
+      </div>
+
+      {/* <div className="mb-3">
+        <label className="block text-gray-700">Data de Nascimento</label>
+        <input
+          name="nascimento"
+          type="date"
+          className="w-full p-2 border border-gray-300 rounded text-gray-500"
+          required
+        />
+      </div> */}
+
+      <div className="mb-3">
+        <label className="block text-gray-700">CPF</label>
+        <input
+          name="cpf"
+          type="text"
+          maxLength={14}
+          className="w-full p-2 border border-gray-300 rounded text-gray-500"
+          required
+        />
+      </div>
+
+      <div className="mb-3">
+        <label className="block text-gray-700">E-mail</label>
+        <input
+          name="email"
+          type="email"
+          className="w-full p-2 border border-gray-300 rounded text-gray-500"
+          required
+        />
+      </div>
+
+      <div className="mb-3">
+        <label className="block text-gray-700">Senha</label>
+        <input
+          name="password"
+          type="password"
+          className="w-full p-2 border border-gray-300 rounded text-gray-500"
+          required
+        />
+      </div>
+    </>
+  );
+}
+// INTERFACE DE PATIENT DA TABELA OCULTADA!
+// type Patient = {
+//   id: number;
+//   nome: string;
+//   // nascimento: string;
+//   cpf: string;
+//   email: string;
+// };
 
 export default function AdminHome() {
   const [userName, setUserName] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showSearchModal, setShowSearchModal] = useState(false);  // controle do modal pesquisa
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [patients, setPatients] = useState<Patient[]>([]);
+  const [showSearchModal, setShowSearchModal] = useState(false); // controle do modal pesquisa
+
+  // const openCreateModal = () => setShowCreateModal(true);
+  // const closeCreateModal = () => setShowCreateModal(false);
+
+  // const openSearchModal = () => setShowSearchModal(true);
+  function closeSearchModal() {
+    setShowSearchModal(false);
+    setResultados([]);
+  } 
+
+  // const [patients] = useState<Patient[]>([]); - LINHA CORRESPONDENTE A TABELA OCULTADA
+
+  const [accessLevel, setAccessLevel] = useState<AccessLevel>("ADMINISTRADOR");
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [resultados, setResultados] = React.useState<any[]>([]);
+
+
+  // const endpoint = accessEndpointMap[accessLevel];
+
+  // const accessOptions = [
+  //   { value: "ADMINISTRADOR", label: "Administrador" },
+  //   { value: "MEDICO",        label: "Médico" },
+  //   { value: "ENFERMAGEM",    label: "Enfermeiro" },
+  //   { value: "PESQUISADOR",   label: "Pesquisador" },
+  // ];
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -33,65 +209,168 @@ export default function AdminHome() {
     }
   }, []);
 
-  const openCreateModal = () => setShowCreateModal(true);
-  const closeCreateModal = () => setShowCreateModal(false);
+  //--------------  Submit Profile Function  --------------//
+  async function handleRegister(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
 
-  const openSearchModal = () => setShowSearchModal(true);
-  const closeSearchModal = () => setShowSearchModal(false);
+    const base = {
+      nome: fd.get("nome"),
+      cpf: fd.get("cpf"),
+      email: fd.get("email"),
+      password: fd.get("password"),
+    };
+
+    let payload: Record<string, unknown> = base;
+
+    switch (accessLevel) {
+      case "MEDICO":
+        payload = {
+          ...base,
+          crm: fd.get("crm"),
+          especializacoes: ((fd.get("especializacoes") as string) || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        };
+        break;
+
+      case "ENFERMAGEM":
+        payload = { ...base, coren: fd.get("coren") };
+        break;
+
+      case "PESQUISADOR":
+        payload = {
+          ...base,
+          idInstituicao: fd.get("idInstituicao"),
+          idAreasAtuacao: ((fd.get("idAreasAtuacao") as string) || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        };
+        break;
+
+      // ADMINISTRADOR → somente base
+    }
+
+    const endpoint = accessEndpointMap[accessLevel];
+
+    try {
+      const resp = await fetch(`http://localhost:4000/proxy${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      if (!resp.ok) throw new Error(await resp.text());
+
+      alert("Profissional registrado com sucesso!");
+      form.reset();
+      setAccessLevel("ADMINISTRADOR");
+      setShowCreateModal(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      alert(`Falha: ${err.message}`);
+    }
+  }
+
+  async function handleSearch(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const params = new URLSearchParams();
+
+    const nome = form.get("nome")?.toString().trim();
+    const email = form.get("email")?.toString().trim();
+
+    if (nome) params.append("nome", nome);
+    if (email) params.append("email", email);
+
+    if (accessLevel === "MEDICO") {
+      const crm = form.get("crm")?.toString().trim();
+      const especializacao = form.get("especializacao")?.toString().trim();
+      if (crm) params.append("crm", crm);
+      if (especializacao) params.append("especializacao", especializacao);
+    }
+
+    if (accessLevel === "ENFERMAGEM") {
+      const coren = form.get("coren")?.toString().trim();
+      if (coren) params.append("coren", coren);
+    }
+
+    try {
+      const endpointMap = {
+        ADMINISTRADOR: "/api/adm/administradores",
+        MEDICO: "/api/adm/Medicos",
+        ENFERMAGEM: "/api/adm/enfermeiros",
+        PESQUISADOR: "/api/adm/pesquisadores",
+      };
+
+      const url = `http://localhost:4000/proxy${
+        endpointMap[accessLevel]
+      }?${params.toString()}`;
+      const response = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error(await response.text());
+      const result = await response.json();
+      console.log("Resultados:", result);
+      setResultados(result.content || []); // garantir que seja array
+
+      // Aqui você pode setar no estado local para renderizar na tela
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      alert(`Erro ao buscar: ${err.message}`);
+    }
+  }
 
   return (
     <div
       className="relative flex flex-col items-center min-h-screen bg-cover bg-bottom px-4 py-8"
       style={{ backgroundImage: "url('/bg.jpg')" }}
     >
-      {/* Cabeçalho */}
-      <div className="container-home1 mb-6 flex flex-col items-center">
-        {/* Seção com fundo branco */}
+      {/* cabeçalho */}
+      <header className="container-home1 mb-6 flex flex-col items-center">
         <div className="container-home2 text-center">
-          <div className="flex justify-center">
-            <Image
-              src="/huoc-system.png"
-              alt="Ícone HUOC"
-              width={60}
-              height={48}
-            />
-          </div>
+          <Image src="/huoc-system.png" alt="HUOC" width={60} height={48} />
           <h2 className="text-content1 text-2xl font-bold mb-2">
-            Olá {userName}, bem vindo de volta!
+            Olá {userName}, bem-vindo de volta!
           </h2>
-
-          <div className="mt-2">
-            <LogoutButton />
-          </div>
+          <LogoutButton />
         </div>
 
-        {/* Botões logo abaixo da div branca */}
         <div className="flex gap-3 mt-6">
           <button
-            onClick={openCreateModal}
+            onClick={() => setShowCreateModal(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2"
           >
-            <strong>Criar Pessoa</strong> <i className="bi bi-people" />
+            <strong>Registrar Profissionais</strong>{" "}
+            <i className="bi bi-people" />
           </button>
 
           <button
-            onClick={openSearchModal}
+            onClick={() => setShowSearchModal(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2"
           >
-            <strong>Pesquisar Pessoa</strong> <i className="bi bi-search" />
+            <strong>Pesquisar Profissionais</strong>{" "}
+            <i className="bi bi-search" />
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Tabela */}
-      <div className="w-full max-w-4xl flex flex-col gap-4 items-center">
+      {/* tabela placeholder - DESATIVADA TEMPORARIAMENTE ATÉ SURGIU NECESSIDADE */}
+
+      {/* <section className="w-full max-w-4xl flex flex-col gap-4 items-center">
         <div className="overflow-x-auto w-full">
-          <table className="w-full text-black bg-white/20 backdrop-blur rounded-xl overflow-hidden">
+          <table className="w-full text-black bg-white/20 backdrop-blur rounded-xl">
             <thead className="bg-white text-sm text-black uppercase">
               <tr>
                 <th className="px-4 py-2">ID</th>
                 <th className="px-4 py-2">Nome</th>
-                <th className="px-4 py-2">Data de Nascimento</th>
+                <th className="px-4 py-2">Nascimento</th>
                 <th className="px-4 py-2">CPF</th>
                 <th className="px-4 py-2">E-mail</th>
                 <th className="px-4 py-2">Opções</th>
@@ -106,99 +385,84 @@ export default function AdminHome() {
                 </tr>
               ) : (
                 patients.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="text-center hover:bg-white/10 transition"
-                  >
+                  <tr key={p.id} className="text-center hover:bg-white/10">
                     <td className="py-2">{p.id}</td>
                     <td>{p.nome}</td>
                     <td>{p.nascimento}</td>
                     <td>{p.cpf}</td>
                     <td>{p.email}</td>
-                    <td>
-                      <button className="text-blue-300 hover:text-white mr-2">
-                        <i className="bi bi-eye-fill" />
-                      </button>
-                      <button className="text-yellow-300 hover:text-white mr-2">
-                        <i className="bi bi-pencil-square" />
-                      </button>
-                      <button className="text-red-400 hover:text-white">
-                        <i className="bi bi-trash-fill" />
-                      </button>
-                    </td>
+                    <td>…</td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
         </div>
-      </div>
+      </section> */}
 
-      {/* Modal Criar Pessoa */}
+      {/* ------------------ MODAL REGISTRO ------------------ */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/30 bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-xl w-full max-w-xl p-6 shadow-xl">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold text-gray-800">
-                Criar Pessoa
+                Formulário de Registro
               </h3>
               <button
-                onClick={closeCreateModal}
+                onClick={() => setShowCreateModal(false)}
                 className="text-gray-500 hover:text-black"
               >
                 <i className="bi bi-x-lg" />
               </button>
             </div>
-            <form id="criar-paciente-form">
-              <div className="mb-3">
-                <label className="block text-gray-700">Nome</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border border-gray-300 rounded text-gray-500"
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="block text-gray-700">
-                  Data de Nascimento
+
+            <form id="create-profile-form" onSubmit={handleRegister}>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-1">
+                  Nível de Acesso
                 </label>
-                <input
-                  type="date"
-                  className="w-full p-2 border border-gray-300 rounded text-gray-500"
-                  required
-                />
+                <div
+                  role="group"
+                  className="inline-flex rounded-md shadow-sm overflow-hidden"
+                >
+                  {accessOptions.map((opt, idx) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => {
+                        setAccessLevel(opt.value as AccessLevel);
+                        setResultados([]);
+                      }}
+                      className={[
+                        "px-4 py-1 text-sm font-medium border",
+                        idx !== 0 && "border-l-0",
+                        idx === 0 && "rounded-l-md",
+                        idx === accessOptions.length - 1 && "rounded-r-md",
+                        accessLevel === opt.value
+                          ? "bg-blue-600 text-white border-blue-600"
+                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="mb-3">
-                <label className="block text-gray-700">CPF</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border border-gray-300 rounded text-gray-500"
-                  maxLength={14}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="block text-gray-700">E-mail</label>
-                <input
-                  type="email"
-                  className="w-full p-2 border border-gray-300 rounded text-gray-500"
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="block text-gray-700">Senha</label>
-                <input
-                  type="password"
-                  className="w-full p-2 border border-gray-300 rounded text-gray-500"
-                  required
-                />
-              </div>
+
+              {/* campos comuns */}
+              <CommonFields />
+
+              {/* campos específicos */}
+              <ExtraFields level={accessLevel} />
+
               <div className="flex justify-end">
                 <button
                   type="submit"
                   className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                 >
-                  Criar Pessoa
+                  Salvar
                 </button>
               </div>
             </form>
@@ -206,61 +470,131 @@ export default function AdminHome() {
         </div>
       )}
 
-      {/* Modal Pesquisar Pessoa */}
+      {/* ------------------ MODAL PESQUISA (placeholder) ------------------ */}
       {showSearchModal && (
-        <div
-          className="fixed inset-0 bg-black/30 bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="searchModalLabel"
-          tabIndex={-1}
-        >
-          <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-xl">
-            <div className="modal-header flex justify-between items-center mb-4">
-              <h5
-                className="modal-title text-xl font-semibold text-gray-800"
-                id="searchModalLabel"
-              >
-                Pesquisar Pessoa
-              </h5>
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-xl p-6 shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold text-gray-800">
+                Pesquisar Profissionais
+              </h3>
               <button
-                type="button"
                 onClick={closeSearchModal}
-                className="btn-close text-gray-500 hover:text-black"
-                aria-label="Fechar"
+                className="text-gray-500 hover:text-black"
               >
                 <i className="bi bi-x-lg" />
               </button>
             </div>
 
-            <div className="modal-body">
-              <form id="searchFormPatient">
-                <div className="mb-3">
-                  <input
-                    type="email"
-                    className="searchEmailPatient w-full p-2 border border-gray-300 rounded text-gray-500"
-                    id="searchEmailPatient"
-                    placeholder="Digite o nome do Pessoa"
-                    required
-                  />
-                </div>
-              </form>
-            </div>
-
-            <div className="text-center">
-              <div id="resultsGet" className="mt-3"></div>
-            </div>
-
-            <div className="modal-footer flex justify-end mt-4">
-              <button
-                type="button"
-                className="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                // Aqui você pode colocar a função de pesquisa ao clicar
-                onClick={() => alert("Implementar pesquisa")}
+            {/* Botões para selecionar tipo de profissional */}
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1">
+                Nível de Acesso
+              </label>
+              <div
+                role="group"
+                className="inline-flex rounded-md shadow-sm overflow-hidden"
               >
-                Pesquisar
-              </button>
+                {/* ["ADMINISTRADOR", "MEDICO", "ENFERMAGEM"] */}
+                {accessOptions.map(
+                  (opt, idx) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => {
+                        setAccessLevel(opt.value as AccessLevel);
+                        setResultados([]);
+                      }}
+                      className={[
+                        "px-4 py-1 text-sm font-medium border",
+                        idx !== 0 && "border-l-0", // Remove border-left nos botões do meio e último
+                        idx === 0 && "rounded-l-md", // Canto esquerdo arredondado no primeiro botão
+                        idx === accessOptions.length - 1 && "rounded-r-md", // Canto direito arredondado no último botão
+                        accessLevel === opt.value
+                          ? "bg-blue-600 text-white border-blue-600"
+                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      {opt.label}
+                    </button>
+                  )
+                )}
+              </div>
             </div>
+
+            {/* Formulário de pesquisa dinâmico */}
+            <form onSubmit={handleSearch}>
+              <div className="mb-3 text-gray-700">
+                <label className="block text-sm">Nome</label>
+                <input name="nome" className="w-full border p-2 rounded" />
+              </div>
+              <div className="mb-3 text-gray-700">
+                <label className="block text-sm">Email</label>
+                <input name="email" className="w-full border p-2 rounded" />
+              </div>
+
+              {accessLevel === "MEDICO" && (
+                <>
+                  <div className="mb-3 text-gray-700">
+                    <label className="block text-sm">CRM</label>
+                    <input name="crm" className="w-full border p-2 rounded" />
+                  </div>
+                  <div className="mb-3 text-gray-700">
+                    <label className="block text-sm">Especialização</label>
+                    <input
+                      name="especializacao"
+                      className="w-full border p-2 rounded"
+                    />
+                  </div>
+                </>
+              )}
+
+              {accessLevel === "ENFERMAGEM" && (
+                <div className="mb-3 text-gray-700">
+                  <label className="block text-sm">COREN</label>
+                  <input name="coren" className="w-full border p-2 rounded" />
+                </div>
+              )}
+
+              <div className="flex justify-end mt-4">
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                  Pesquisar
+                </button>
+              </div>
+            </form>
+
+            {/* Resultados da pesquisa */}
+            {resultados.length > 0 ? (
+              <div className="mt-6 text-blue-600">
+                {/* <h4 className="font-semibold mb-2">Resultados:</h4> */}
+                <ul className="divide-y border rounded">
+                  {resultados.map((item, idx) => (
+                    <li key={idx} className="p-2 text-center text-gray-700">
+                      <p><strong>Nome:</strong> {item.nome}</p>
+                      <p><strong>CPF:</strong> {item.cpf}</p>
+                      <p><strong>Email:</strong> {item.email}</p>
+                      {accessLevel === "MEDICO" && <p><strong>CRM:</strong> {item.crm}</p>}
+                      {accessLevel === "MEDICO" && <p><strong>Especializações:</strong> {(item.especializacoes || []).join(", ")}</p>}
+                      {accessLevel === "ENFERMAGEM" && <p><strong>COREN:</strong> {item.coren}</p>}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  onClick={() => setResultados([])}
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded mx-auto block mt-2"
+                >
+                  Limpar Resultado
+                </button>
+              </div>
+            ) : (
+              <p className="mt-6 text-gray-500">Nenhum resultado encontrado.</p>
+            )}
           </div>
         </div>
       )}
