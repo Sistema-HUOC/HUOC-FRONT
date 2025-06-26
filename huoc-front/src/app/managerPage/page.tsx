@@ -13,7 +13,6 @@ const accessOptions = [
   { value: "PESQUISADOR", label: "Pesquisador" },
 ];
 
-
 // INTERFACE DE PATIENT DA TABELA OCULTADA!
 // type Patient = {
 //   id: number;
@@ -35,26 +34,19 @@ export default function AdminHome() {
   function closeSearchModal() {
     setShowSearchModal(false);
     setResultados([]);
+    setSearched(false);
+    setAtivo(true);
   }
 
   // const [patients] = useState<Patient[]>([]); - LINHA CORRESPONDENTE A TABELA OCULTADA
-
   const [accessLevel, setAccessLevel] = useState<AccessLevel>("ADMINISTRADOR");
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [resultados, setResultados] = React.useState<any[]>([]);
-
+  const [searched, setSearched] = useState(false);
   const [specializations, setSpecializations] = useState<string[]>([]);
   const [newSpecialization, setNewSpecialization] = useState("");
+  const [ativo, setAtivo] = useState<boolean>(true);
 
-  // const endpoint = accessEndpointMap[accessLevel];
-
-  // const accessOptions = [
-  //   { value: "ADMINISTRADOR", label: "Administrador" },
-  //   { value: "MEDICO",        label: "Médico" },
-  //   { value: "ENFERMAGEM",    label: "Enfermeiro" },
-  //   { value: "PESQUISADOR",   label: "Pesquisador" },
-  // ];
 
   useEffect(() => {
     fetch("http://localhost:4000/proxy/api/adm/especializacoes", {
@@ -77,10 +69,8 @@ export default function AdminHome() {
     }
   }, []);
 
-
-
   //---------- Function HTML de Register Exibição ----------//
-    function ExtraFields({ level }: { level: AccessLevel }) {
+  function ExtraFields({ level }: { level: AccessLevel }) {
     switch (level) {
       case "MEDICO":
         return (
@@ -96,7 +86,9 @@ export default function AdminHome() {
             </div>
 
             <div className="mb-3">
-              <label className="block text-gray-700 mb-1">Especializações</label>
+              <label className="block text-gray-700 mb-1">
+                Especializações
+              </label>
               <select
                 name="especializacoes"
                 multiple
@@ -108,11 +100,15 @@ export default function AdminHome() {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-gray-500 mt-1">Segure Ctrl (ou Cmd) para selecionar múltiplas</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Segure Ctrl (ou Cmd) para selecionar múltiplas
+              </p>
             </div>
 
             <div className="mb-3">
-              <label className="block text-gray-700">Adicionar nova especialização</label>
+              <label className="block text-gray-700">
+                Adicionar nova especialização
+              </label>
               <div className="flex gap-2 mt-1">
                 <input
                   type="text"
@@ -235,9 +231,6 @@ export default function AdminHome() {
     );
   }
 
-
-
-
   //--------------  Submit Profile Function  --------------//
   async function handleAddSpecialization() {
     if (!newSpecialization.trim()) return;
@@ -258,7 +251,7 @@ export default function AdminHome() {
       setSpecializations((prev) => [...prev, newSpecialization]);
       setNewSpecialization("");
       alert("Especialização adicionada com sucesso!");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert(`Erro ao adicionar especialização: ${err.message}`);
     }
@@ -301,8 +294,7 @@ export default function AdminHome() {
             .filter(Boolean),
         };
         break;
-
-      // ADMINISTRADOR → somente base
+        // ADMINISTRADOR → somente base
     }
 
     const endpoint = accessEndpointMap[accessLevel];
@@ -329,6 +321,7 @@ export default function AdminHome() {
 
   async function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSearched(true);
     const form = new FormData(e.currentTarget);
     const params = new URLSearchParams();
 
@@ -337,6 +330,8 @@ export default function AdminHome() {
 
     if (nome) params.append("nome", nome);
     if (email) params.append("email", email);
+
+    params.append("ativo", ativo.toString());
 
     if (accessLevel === "MEDICO") {
       const crm = form.get("crm")?.toString().trim();
@@ -369,9 +364,7 @@ export default function AdminHome() {
       if (!response.ok) throw new Error(await response.text());
       const result = await response.json();
       console.log("Resultados:", result);
-      setResultados(result.content || []); // garantir que seja array
-
-      // Aqui você pode setar no estado local para renderizar na tela
+      setResultados(result.content || []); 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert(`Erro ao buscar: ${err.message}`);
@@ -398,30 +391,27 @@ export default function AdminHome() {
             onClick={() => setShowCreateModal(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2"
           >
-            <strong>Registrar Profissionais</strong>{" "}
-            <i className="bi bi-people" />
+            <strong>Cadastrar</strong> <i className="bi bi-people" />
           </button>
 
-          {/* <button
-            onClick={() => setShowCreateModal(true)}
+          {/* <button //ATIVAR/DESATIVAR - PROFISSIONAIS
+            onClick={() => }
             className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2"
           >
-            <strong>Registrar Especialidades</strong>{" "}
-            <i className="bi bi-people" />
+            <strong>Ativar/Desativar</strong>{" "}
+            <i className="bi bi-person-gear" />
           </button> */}
 
           <button
             onClick={() => setShowSearchModal(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2"
           >
-            <strong>Pesquisar Profissionais</strong>{" "}
-            <i className="bi bi-search" />
+            <strong>Pesquisar</strong> <i className="bi bi-search" />
           </button>
         </div>
       </header>
 
       {/* tabela placeholder - DESATIVADA TEMPORARIAMENTE ATÉ SURGIU NECESSIDADE */}
-
       {/* <section className="w-full max-w-4xl flex flex-col gap-4 items-center">
         <div className="overflow-x-auto w-full">
           <table className="w-full text-black bg-white/20 backdrop-blur rounded-xl">
@@ -463,7 +453,6 @@ export default function AdminHome() {
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-xl w-full max-w-xl max-h-[80vh] shadow-xl overflow-y-auto">
-            
             <div className="flex justify-between items-center mt-0.5 sticky top-0 bg-white z-10 shadow-md px-4 py-2 rounded-t-xl w-full">
               <h3 className="text-xl font-semibold text-gray-800">
                 Formulário de Registro
@@ -476,10 +465,19 @@ export default function AdminHome() {
               </button>
             </div>
 
-            <form id="create-profile-form" onSubmit={handleRegister} className="space-y-4 p-5">
+            <form
+              id="create-profile-form"
+              onSubmit={handleRegister}
+              className="space-y-4 p-5"
+            >
               <div className="mb-6">
-                <label className="block text-gray-700 mb-1">Nível de Acesso</label>
-                <div role="group" className="inline-flex rounded-md shadow-sm overflow-hidden">
+                <label className="block text-gray-700 mb-1">
+                  Nível de Acesso
+                </label>
+                <div
+                  role="group"
+                  className="inline-flex rounded-md shadow-sm overflow-hidden"
+                >
                   {accessOptions.map((opt, idx) => (
                     <button
                       key={opt.value}
@@ -525,12 +523,10 @@ export default function AdminHome() {
         </div>
       )}
 
-
       {/* ------------------ MODAL PESQUISA (placeholder) ------------------ */}
       {showSearchModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-xl w-full max-w-xl max-h-[80vh] shadow-xl overflow-y-auto">
-
             <div className="flex justify-between items-center mt-0.5 sticky top-0 bg-white z-10 shadow-md px-4 py-2 rounded-t-xl w-full">
               <h3 className="text-xl font-semibold text-gray-800">
                 Pesquisar Profissionais
@@ -560,12 +556,14 @@ export default function AdminHome() {
                     onClick={() => {
                       setAccessLevel(opt.value as AccessLevel);
                       setResultados([]);
+                      setSearched(false);
+                      setAtivo(true);
                     }}
                     className={[
                       "px-4 py-1 text-sm font-medium border",
-                      idx !== 0 && "border-l-0", // Remove border-left nos botões do meio e último
-                      idx === 0 && "rounded-l-md", // Canto esquerdo arredondado no primeiro botão
-                      idx === accessOptions.length - 1 && "rounded-r-md", // Canto direito arredondado no último botão
+                      idx !== 0 && "border-l-0",
+                      idx === 0 && "rounded-l-md",
+                      idx === accessOptions.length - 1 && "rounded-r-md",
                       accessLevel === opt.value
                         ? "bg-blue-600 text-white border-blue-600"
                         : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100",
@@ -580,40 +578,77 @@ export default function AdminHome() {
             </div>
 
             {/* Formulário de pesquisa dinâmico */}
-            <form onSubmit={handleSearch} className="space-y-4 p-5">
-              <div className="mb-3 text-gray-700">
-                <label className="block text-sm">Nome</label>
-                <input name="nome" className="w-full border p-2 rounded border-gray-300 text-gray-500" />
-              </div>
-              <div className="mb-3 text-gray-700">
-                <label className="block text-sm">Email</label>
-                <input name="email" className="w-full border p-2 border-gray-300 rounded text-gray-500" />
-              </div>
+            <form onSubmit={handleSearch} className="">
+              <div className="space-y-4 p-5">
+                <div className="mb-3 text-gray-700">
+                  <label className="block text-sm">Nome</label>
+                  <input
+                    name="nome"
+                    className="w-full border p-2 rounded border-gray-300 text-gray-500"
+                  />
+                </div>
+                <div className="mb-3 text-gray-700">
+                  <label className="block text-sm">Email</label>
+                  <input
+                    name="email"
+                    className="w-full border p-2 border-gray-300 rounded text-gray-500"
+                  />
+                </div>
 
-              {accessLevel === "MEDICO" && (
-                <>
+                {accessLevel === "MEDICO" && (
+                  <>
+                    <div className="mb-3 text-gray-700">
+                      <label className="block text-sm">CRM</label>
+                      <input
+                        name="crm"
+                        className="w-full border p-2 border-gray-300 rounded text-gray-500"
+                      />
+                    </div>
+                    <div className="mb-3 text-gray-700">
+                      <label className="block text-sm">Especialização</label>
+                      <input
+                        name="especializacao"
+                        className="w-full border p-2 border-gray-300 rounded text-gray-500"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {accessLevel === "ENFERMAGEM" && (
                   <div className="mb-3 text-gray-700">
-                    <label className="block text-sm">CRM</label>
-                    <input name="crm" className="w-full border p-2 border-gray-300 rounded text-gray-500" />
-                  </div>
-                  <div className="mb-3 text-gray-700">
-                    <label className="block text-sm">Especialização</label>
+                    <label className="block text-sm">COREN</label>
                     <input
-                      name="especializacao"
+                      name="coren"
                       className="w-full border p-2 border-gray-300 rounded text-gray-500"
                     />
                   </div>
-                </>
-              )}
+                )}
+              </div>
 
-              {accessLevel === "ENFERMAGEM" && (
-                <div className="mb-3 text-gray-700">
-                  <label className="block text-sm">COREN</label>
-                  <input name="coren" className="w-full border p-2 border-gray-300 rounded text-gray-500" />
-                </div>
-              )}
+              <div className="mb-3 text-gray-700  flex items-center justify-end pr-5">
+                <span className="mr-2 text-sm">Inativas</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={ativo}
+                    onChange={(e) => setAtivo(e.target.checked)}
+                  />
+                  {/* trilho do switch */}
+                  <div
+                    className="w-11 h-6 bg-red-400 peer-focus:outline-none peer-focus:ring-2
+                                  peer-focus:ring-gray-400 rounded-full peer
+                                  peer-checked:bg-blue-600
+                                  peer-checked:after:translate-x-full
+                                  after:absolute after:content-[''] after:top-[2px] after:left-[2px]
+                                  after:bg-white after:border-gray-300 after:border after:rounded-full
+                                  after:h-5 after:w-5 after:transition-all"
+                  ></div>
+                </label>
+                <span className="ml-2 text-sm">Ativas</span>
+              </div>
 
-              <div className="flex justify-center mt-4">
+              <div className="flex justify-center mt-4 mb-2">
                 <button
                   type="submit"
                   className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -625,7 +660,7 @@ export default function AdminHome() {
 
             {/* Resultados da pesquisa */}
             {resultados.length > 0 ? (
-              <div className="mt-3 text-blue-600 p-5">
+              <div className="mt-2 text-blue-600 p-5">
                 <ul className="divide-y border rounded">
                   {resultados.map((item, idx) => (
                     <li key={idx} className="p-2 text-center text-gray-700">
@@ -668,7 +703,11 @@ export default function AdminHome() {
                 </button>
               </div>
             ) : (
-              <p className="mt-5 text-gray-500 p-5 text-center">Nenhum resultado encontrado.</p>
+              searched && ( // só mostra se já pesquisou
+                <p className="mt-5 text-gray-500 p-5 text-center">
+                  Nenhum resultado encontrado.
+                </p>
+              )
             )}
           </div>
         </div>
