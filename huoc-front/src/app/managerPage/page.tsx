@@ -22,6 +22,150 @@ const accessOptions = [
 //   email: string;
 // };
 
+/* ------------------------------------------------------------------
+   Componente reutilizável para “Adicionar nova especialização”
+   ------------------------------------------------------------------ */
+type AddSpecProps = {
+  value: string;
+  setValue: (s: string) => void;
+  onAdd: () => void;
+};
+
+export const AddSpecializationBlock: React.FC<AddSpecProps> = ({
+  value,
+  setValue,
+  onAdd,
+}) => (
+  <div className="mb-4 px-5">
+    <label htmlFor="novaEsp" className="block text-gray-700">
+      Adicionar nova especialização:
+    </label>
+
+    <div className="flex gap-2 mt-1">
+      <input
+        id="novaEsp"
+        name="novaEspecializacao"
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            onAdd();
+          }
+        }}
+        className="flex-1 p-2 border border-gray-300 rounded text-gray-500"
+        placeholder="Ex: Nefrologia"
+        autoComplete="off"
+      />
+
+      <button
+        type="button"
+        onClick={onAdd}
+        className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700"
+      >
+        Adicionar
+      </button>
+    </div>
+  </div>
+);
+
+type ExtraProps = {
+  level: AccessLevel;
+  specializations: string[];
+  value: string;                       // <- NEW
+  setValue: (s: string) => void;       // <- NEW
+  onAdd: () => void;                   // <- NEW
+};
+
+// eslint-disable-next-line react/display-name
+export const ExtraFields = React.memo(
+  ({ level, specializations, value, setValue, onAdd }: ExtraProps) => {
+    if (level !== "MEDICO" && level !== "ENFERMAGEM" && level !== "PESQUISADOR")
+      return null;
+
+    if (level === "MEDICO") {
+      return (
+        <>
+          <div className="mb-3">
+            <label className="block text-gray-700 mb-1">Especializações</label>
+            <select
+              name="especializacoes"
+              multiple
+              className="w-full p-2 border border-gray-300 rounded text-blue-700 underline"
+            >
+              {specializations.map((esp) => (
+                <option key={esp} value={esp}>
+                  {esp}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Segure Ctrl (ou Cmd) para selecionar múltiplas
+            </p>
+          </div>
+
+          <AddSpecializationBlock
+            value={value}
+            setValue={setValue}
+            onAdd={onAdd}
+          />
+
+          <div className="mb-3">
+            <label className="block text-gray-700">CRM</label>
+            <input
+              name="crm"
+              className="w-full p-2 border border-gray-300 rounded text-gray-500"
+              required
+            />
+          </div>
+        </>
+      );
+    }
+
+    if (level === "ENFERMAGEM") {
+      return (
+        <div className="mb-3">
+          <label className="block text-gray-700">COREN</label>
+          <input
+            name="coren"
+            className="w-full p-2 border border-gray-300 rounded text-gray-500"
+            required
+          />
+        </div>
+      );
+    }
+
+    /* PESQUISADOR */
+    return (
+      <>
+        <div className="mb-3">
+          <label className="block text-gray-700">Instituição (ID)</label>
+          <input
+            name="idInstituicao"
+            className="w-full p-2 border border-gray-300 rounded text-gray-500"
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label className="block text-gray-700">
+            Áreas de Atuação (IDs, vírgulas)
+          </label>
+          <input
+            name="idAreasAtuacao"
+            placeholder="id1,id2"
+            className="w-full p-2 border border-gray-300 rounded text-gray-500"
+          />
+        </div>
+      </>
+    );
+  }
+);
+
+
+
+
+
 export default function AdminHome() {
   const [userName, setUserName] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -43,9 +187,21 @@ export default function AdminHome() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [resultados, setResultados] = React.useState<any[]>([]);
   const [searched, setSearched] = useState(false);
+
   const [specializations, setSpecializations] = useState<string[]>([]);
   const [newSpecialization, setNewSpecialization] = useState("");
+
   const [ativo, setAtivo] = useState<boolean>(true);
+
+  const [showActivationModal, setShowActivationModal] = useState(false);
+  const [activationEmail, setActivationEmail] = useState("");
+  const [activateFlag, setActivateFlag] = useState<boolean>(true);
+  const [activationMsg, setActivationMsg] = useState<{  /* feedback + loading */
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
+  const [loadingActivation, setLoadingActivation] = useState(false);
 
 
   useEffect(() => {
@@ -69,111 +225,7 @@ export default function AdminHome() {
     }
   }, []);
 
-  //---------- Function HTML de Register Exibição ----------//
-  function ExtraFields({ level }: { level: AccessLevel }) {
-    switch (level) {
-      case "MEDICO":
-        return (
-          <>
-            <div className="mb-3">
-              <label className="block text-gray-700">CRM</label>
-              <input
-                name="crm"
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded text-gray-500"
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="block text-gray-700 mb-1">
-                Especializações
-              </label>
-              <select
-                name="especializacoes"
-                multiple
-                className="w-full p-2 border border-gray-300 rounded text-blue-700 underline"
-              >
-                {specializations.map((esp) => (
-                  <option key={esp} value={esp}>
-                    {esp}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-500 mt-1">
-                Segure Ctrl (ou Cmd) para selecionar múltiplas
-              </p>
-            </div>
-
-            <div className="mb-3">
-              <label className="block text-gray-700">
-                Adicionar nova especialização
-              </label>
-              <div className="flex gap-2 mt-1">
-                <input
-                  type="text"
-                  value={newSpecialization}
-                  onChange={(e) => setNewSpecialization(e.target.value)}
-                  className="flex-1 p-2 border border-gray-300 rounded text-gray-500"
-                  placeholder="Ex: Nefrologia"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddSpecialization}
-                  className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700"
-                >
-                  Adicionar
-                </button>
-              </div>
-            </div>
-          </>
-        );
-
-      case "ENFERMAGEM":
-        return (
-          <div className="mb-3">
-            <label className="block text-gray-700">COREN</label>
-            <input
-              name="coren"
-              type="text"
-              className="w-full p-2 border border-gray-300 rounded text-gray-500"
-              required
-            />
-          </div>
-        );
-
-      case "PESQUISADOR":
-        return (
-          <>
-            <div className="mb-3">
-              <label className="block text-gray-700">Instituição (ID)</label>
-              <input
-                name="idInstituicao"
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded text-gray-500"
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="block text-gray-700">
-                Áreas de Atuação (IDs, vírgulas)
-              </label>
-              <input
-                name="idAreasAtuacao"
-                type="text"
-                placeholder="id1,id2,id3"
-                className="w-full p-2 border border-gray-300 rounded text-gray-500"
-              />
-            </div>
-          </>
-        );
-
-      default:
-        return null; // ADMINISTRADOR não tem extras
-    }
-  }
-
+  //------------- Campos de Preenchimento Padrão -------------//
   function CommonFields() {
     return (
       <>
@@ -186,16 +238,6 @@ export default function AdminHome() {
             required
           />
         </div>
-
-        {/* <div className="mb-3">
-          <label className="block text-gray-700">Data de Nascimento</label>
-          <input
-            name="nascimento"
-            type="date"
-            className="w-full p-2 border border-gray-300 rounded text-gray-500"
-            required
-          />
-        </div> */}
 
         <div className="mb-3">
           <label className="block text-gray-700">CPF</label>
@@ -231,7 +273,17 @@ export default function AdminHome() {
     );
   }
 
-  //--------------  Submit Profile Function  --------------//
+  function openActivationModal() {
+    setShowActivationModal(true);
+    setActivationEmail("");
+    setActivateFlag(true);
+  }
+
+  function closeActivationModal() {
+    setShowActivationModal(false);
+  }
+
+  //-------------- Função de Submissão de Especialização --------------//
   async function handleAddSpecialization() {
     if (!newSpecialization.trim()) return;
 
@@ -257,6 +309,7 @@ export default function AdminHome() {
     }
   }
 
+  //----------------- Função de Cadastro --------------//
   async function handleRegister(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
@@ -294,7 +347,7 @@ export default function AdminHome() {
             .filter(Boolean),
         };
         break;
-        // ADMINISTRADOR → somente base
+      // ADMINISTRADOR → somente base
     }
 
     const endpoint = accessEndpointMap[accessLevel];
@@ -319,6 +372,7 @@ export default function AdminHome() {
     }
   }
 
+  //------------------- Função de Busca -----------------//
   async function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSearched(true);
@@ -364,12 +418,51 @@ export default function AdminHome() {
       if (!response.ok) throw new Error(await response.text());
       const result = await response.json();
       console.log("Resultados:", result);
-      setResultados(result.content || []); 
+      setResultados(result.content || []);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert(`Erro ao buscar: ${err.message}`);
     }
   }
+
+  //------------- Função de Ativação/Desativação -----------------//
+  async function handleActivation(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    try {
+      const resp = await fetch("http://localhost:4000/proxy/api/adm", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          targetUserEmail: activationEmail,
+          activate: activateFlag,
+        }),
+      });
+
+      if (!resp.ok) throw new Error(await resp.text());
+
+      setActivationMsg({
+        type: "success",
+        text: `Conta ${activateFlag ? "ativada" : "desativada"} com sucesso.`,
+      });
+
+      setTimeout(closeActivationModal, 2000);
+
+      closeActivationModal();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setActivationMsg({
+        type: "error",
+        text: err.message || "Falha ao alterar status.",
+      });
+    } finally {
+      setLoadingActivation(false);
+    }
+  }
+
+
+
 
   return (
     <div
@@ -394,13 +487,13 @@ export default function AdminHome() {
             <strong>Cadastrar</strong> <i className="bi bi-people" />
           </button>
 
-          {/* <button //ATIVAR/DESATIVAR - PROFISSIONAIS
-            onClick={() => }
+          <button
+            onClick={openActivationModal}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2"
           >
             <strong>Ativar/Desativar</strong>{" "}
             <i className="bi bi-person-gear" />
-          </button> */}
+          </button>
 
           <button
             onClick={() => setShowSearchModal(true)}
@@ -449,7 +542,7 @@ export default function AdminHome() {
         </div>
       </section> */}
 
-      {/* ------------------ MODAL REGISTRO ------------------ */}
+      {/* ------------------ MODAL DE CADASTRO ------------------ */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-xl w-full max-w-xl max-h-[80vh] shadow-xl overflow-y-auto">
@@ -468,8 +561,7 @@ export default function AdminHome() {
             <form
               id="create-profile-form"
               onSubmit={handleRegister}
-              className="space-y-4 p-5"
-            >
+              className="space-y-4 p-5">
               <div className="mb-6">
                 <label className="block text-gray-700 mb-1">
                   Nível de Acesso
@@ -504,17 +596,25 @@ export default function AdminHome() {
                 </div>
               </div>
 
-              {/* campos comuns */}
-              <CommonFields />
+              
+              {/* Campos Específicos - Baseado no nível de acesso*/}
+              <ExtraFields
+                level={accessLevel}
+                specializations={specializations}
+                value={newSpecialization}
+                setValue={setNewSpecialization}
+                onAdd={handleAddSpecialization}
+              />
 
-              {/* campos específicos */}
-              <ExtraFields level={accessLevel} />
+
+              {/* Campos Padrão de todos os perfis */}
+              <CommonFields />
 
               <div className="flex justify-center">
                 <button
                   type="submit"
                   className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
+                  >
                   Salvar
                 </button>
               </div>
@@ -523,7 +623,95 @@ export default function AdminHome() {
         </div>
       )}
 
-      {/* ------------------ MODAL PESQUISA (placeholder) ------------------ */}
+
+
+
+      {/* ------------------ MODAL DE ATIVAÇÃO ------------------ */}
+      {showActivationModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold text-gray-800">
+                Ativar/Desativar Conta
+              </h3>
+              <button
+                onClick={closeActivationModal}
+                className="text-red-500 hover:text-red-700"
+              >
+                <i className="bi bi-x-lg" />
+              </button>
+            </div>
+
+            <form onSubmit={handleActivation} className="space-y-4">
+              {/* e-mail */}
+              <div className="text-gray-700">
+                <label className="block text-sm">E-mail do usuário</label>
+                <input
+                  type="email"
+                  required
+                  value={activationEmail}
+                  onChange={(e) => setActivationEmail(e.target.value)}
+                  className="w-full border p-2 rounded border-gray-300 text-gray-500"
+                />
+              </div>
+
+              {/* switch ativar/desativar */}
+              <div className="flex items-center justify-center">
+                <p className="text-gray-700">Definir status da conta</p>
+                <span className="mr-2 text-sm text-gray-700">: <strong>Desativar</strong></span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={activateFlag}
+                    onChange={(e) => setActivateFlag(e.target.checked)}
+                  />
+                  <div
+                    className="w-11 h-6 bg-red-400 peer-focus:outline-none peer-focus:ring-2
+                                  peer-focus:ring-gray-400 rounded-full peer
+                                  peer-checked:bg-blue-600
+                                  peer-checked:after:translate-x-full
+                                  after:absolute after:content-[''] after:top-[2px] after:left-[2px]
+                                  after:bg-white after:border-gray-300 after:border after:rounded-full
+                                  after:h-5 after:w-5 after:transition-all"
+                  ></div>
+                </label>
+                <span className="ml-2 text-sm text-gray-700"><strong>Ativar</strong></span>
+              </div>
+
+              {/* botão enviar */}
+              <div className="flex justify-center">
+                <button
+                  type="submit"
+                  disabled={loadingActivation}
+                  className={`px-4 py-2 rounded text-white ${
+                    loadingActivation ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                  }`}
+                >
+                  {loadingActivation ? "Processando…" : "Confirmar"}
+                </button>
+              </div>
+            </form>
+
+            {activationMsg && (
+              <div
+                className={`mt-4 p-2 rounded text-sm ${
+                  activationMsg.type === "success"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {activationMsg.text}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+
+
+
+      {/* ------------------ MODAL DE PESQUISA ------------------ */}
       {showSearchModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-xl w-full max-w-xl max-h-[80vh] shadow-xl overflow-y-auto">
@@ -539,7 +727,6 @@ export default function AdminHome() {
               </button>
             </div>
 
-            {/* Botões para selecionar tipo de profissional */}
             <div className="p-5">
               <label className="block text-gray-700 mb-0.5">
                 Nível de Acesso
@@ -658,6 +845,7 @@ export default function AdminHome() {
               </div>
             </form>
 
+
             {/* Resultados da pesquisa */}
             {resultados.length > 0 ? (
               <div className="mt-2 text-blue-600 p-5">
@@ -703,7 +891,7 @@ export default function AdminHome() {
                 </button>
               </div>
             ) : (
-              searched && ( // só mostra se já pesquisou
+              searched && ( 
                 <p className="mt-5 text-gray-500 p-5 text-center">
                   Nenhum resultado encontrado.
                 </p>
