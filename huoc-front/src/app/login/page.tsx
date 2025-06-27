@@ -26,6 +26,9 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
 
+<<<<<<< HEAD
+      const contentType = response.headers.get("content-type");
+=======
 
         /* Response p/ API Externa */
         // const response = await fetch("https://suaapi.com/login", {
@@ -35,6 +38,7 @@ export default function LoginPage() {
         //   },
         //   body: JSON.stringify({ email, password }),
       });
+>>>>>>> main
 
       const data = await response.json();
 
@@ -42,6 +46,23 @@ export default function LoginPage() {
         throw new Error(data.message || "Erro ao logar");
       }
 
+<<<<<<< HEAD
+      // Armazena dados do usuário no localStorage
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          email: data.username,
+          name: data.name,
+          accessLevel: data.accessLevel,
+          userId: data.userId,
+          acceptedTerms: true,
+        })
+      );
+
+      // Redirecionamento baseado no accessLevel
+      switch (data.accessLevel) {
+        case "ADMINISTRADOR":
+=======
       // Armazene o token (se a API retornar um)
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
@@ -55,15 +76,16 @@ export default function LoginPage() {
       // Redirecionamento baseado no email
       switch (data.user.email) {
         case "admin@email.com":
+>>>>>>> main
           router.push("/managerPage");
           break;
-        case "doctor@email.com":
+        case "MEDICO":
           router.push("/doctorPage");
           break;
-        case "nurse@email.com":
+        case "ENFERMEIRO":
           router.push("/nursePage");
           break;
-        case "researcher@email.com":
+        case "PESQUISADOR":
           router.push("/researcherPage");
           break;
         default:
@@ -86,7 +108,17 @@ export default function LoginPage() {
         <section className="container-home2 flex flex-col items-center">
           <Link href="/">
             <figure className="mb-4 cursor-pointer hover:opacity-80 transition-all">
+<<<<<<< HEAD
+              <Image
+                src="/huoc-system.png"
+                alt="HUOC System Logo"
+                width={50}
+                height={50}
+                className="h-12"
+              />
+=======
               <Image src="/huoc-system.png" alt="HUOC System Logo" width={50} height={50} className="h-12" />
+>>>>>>> main
             </figure>
           </Link>
 
@@ -97,11 +129,24 @@ export default function LoginPage() {
 
           <article className="w-full">
             <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+<<<<<<< HEAD
+              {error && (
+                <p className="text-red-600 text-sm text-center">{error}</p>
+              )}
+
+              {/* Email */}
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+=======
               {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
               {/* Email */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+>>>>>>> main
                   E-mail
                 </label>
                 <div className="relative">
@@ -122,7 +167,14 @@ export default function LoginPage() {
 
               {/* Senha */}
               <div>
+<<<<<<< HEAD
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+=======
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+>>>>>>> main
                   Senha
                 </label>
                 <div className="relative">
@@ -142,7 +194,15 @@ export default function LoginPage() {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
                     onClick={() => setShowPassword((prev) => !prev)} // <-- Toggle no clique
                   >
+<<<<<<< HEAD
+                    {showPassword ? (
+                      <BiHide className="text-xl" />
+                    ) : (
+                      <BiShow className="text-xl" />
+                    )}
+=======
                     {showPassword ? <BiHide className="text-xl" /> : <BiShow className="text-xl" />}
+>>>>>>> main
                   </span>
                 </div>
               </div>
@@ -150,8 +210,21 @@ export default function LoginPage() {
               {/* Lembrar e Esqueci */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
+<<<<<<< HEAD
+                  <input
+                    id="remember"
+                    name="remember"
+                    type="checkbox"
+                    className="text-cyan-600 dark:border-white-400/20 dark:scale-100 transition-all duration-500 ease-in-out dark:hover:scale-110 dark:checked:scale-100 h-4 w-4"
+                  />
+                  <label
+                    htmlFor="remember"
+                    className="ml-2 block text-sm text-gray-700"
+                  >
+=======
                   <input id="remember" name="remember" type="checkbox" className="text-cyan-600 dark:border-white-400/20 dark:scale-100 transition-all duration-500 ease-in-out dark:hover:scale-110 dark:checked:scale-100 h-4 w-4"/>
                   <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
+>>>>>>> main
                     Lembrar-me
                   </label>
                 </div>
