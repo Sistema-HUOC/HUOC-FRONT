@@ -20,25 +20,13 @@ export default function LoginPage() {
     setError("");
 
     try {
-      /* Response p/ API Interna */
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-
-<<<<<<< HEAD
-      const contentType = response.headers.get("content-type");
-=======
-
-        /* Response p/ API Externa */
-        // const response = await fetch("https://suaapi.com/login", {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({ email, password }),
       });
->>>>>>> main
+
+      const contentType = response.headers.get("content-type");
 
       const data = await response.json();
 
@@ -46,8 +34,6 @@ export default function LoginPage() {
         throw new Error(data.message || "Erro ao logar");
       }
 
-<<<<<<< HEAD
-      // Armazena dados do usuário no localStorage
       localStorage.setItem(
         "user",
         JSON.stringify({
@@ -59,24 +45,8 @@ export default function LoginPage() {
         })
       );
 
-      // Redirecionamento baseado no accessLevel
       switch (data.accessLevel) {
         case "ADMINISTRADOR":
-=======
-      // Armazene o token (se a API retornar um)
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      // Se o usuário ainda não aceitou os termos, redireciona para /terms
-      if (!data.user.acceptedTerms) {
-        router.push("/terms");
-        return;
-      }
-
-      // Redirecionamento baseado no email
-      switch (data.user.email) {
-        case "admin@email.com":
->>>>>>> main
           router.push("/managerPage");
           break;
         case "MEDICO":
@@ -92,8 +62,7 @@ export default function LoginPage() {
           router.push("/");
       }
     } catch (err: unknown) {
-      if (err instanceof Error)
-        setError(err.message);
+      if (err instanceof Error) setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -108,19 +77,9 @@ export default function LoginPage() {
         <section className="container-home2 flex flex-col items-center">
           <Link href="/">
             <figure className="mb-4 cursor-pointer hover:opacity-80 transition-all">
-<<<<<<< HEAD
-              <Image
-                src="/huoc-system.png"
-                alt="HUOC System Logo"
-                width={50}
-                height={50}
-                className="h-12"
-              />
-=======
               <Image src="/huoc-system.png" alt="HUOC System Logo" width={50} height={50} className="h-12" />
->>>>>>> main
-            </figure>
-          </Link>
+            </figure >
+          </Link >
 
           <h1 className="text-2xl font-bold text-gray-700 mb-6 flex items-center gap-2">
             <BiLogIn className="text-cyan-700 text-3xl" />
@@ -129,122 +88,81 @@ export default function LoginPage() {
 
           <article className="w-full">
             <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-<<<<<<< HEAD
-              {error && (
-                <p className="text-red-600 text-sm text-center">{error}</p>
-              )}
-
-              {/* Email */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-=======
               {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
-              {/* Email */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
->>>>>>> main
-                  E-mail
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-cyan-600">
-                    <BiEnvelope className="text-xl" />
-                  </span>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="pl-10 pr-4 py-2 w-full border text-gray-700 border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500"
-                  />
-                </div>
-              </div>
-
-              {/* Senha */}
-              <div>
-<<<<<<< HEAD
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-=======
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
->>>>>>> main
-                  Senha
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-cyan-600">
-                    <BiLock className="text-xl" />
-                  </span>
-                  <input
-                    type={showPassword ? "text" : "password"} // <-- Muda o type dinamicamente!
-                    id="password"
-                    name="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="pl-10 pr-10 py-2 w-full border text-gray-700 border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500"
-                  />
-                  <span
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-                    onClick={() => setShowPassword((prev) => !prev)} // <-- Toggle no clique
-                  >
-<<<<<<< HEAD
-                    {showPassword ? (
-                      <BiHide className="text-xl" />
-                    ) : (
-                      <BiShow className="text-xl" />
-                    )}
-=======
-                    {showPassword ? <BiHide className="text-xl" /> : <BiShow className="text-xl" />}
->>>>>>> main
-                  </span>
-                </div>
-              </div>
-
-              {/* Lembrar e Esqueci */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-<<<<<<< HEAD
-                  <input
-                    id="remember"
-                    name="remember"
-                    type="checkbox"
-                    className="text-cyan-600 dark:border-white-400/20 dark:scale-100 transition-all duration-500 ease-in-out dark:hover:scale-110 dark:checked:scale-100 h-4 w-4"
-                  />
-                  <label
-                    htmlFor="remember"
-                    className="ml-2 block text-sm text-gray-700"
-                  >
-=======
-                  <input id="remember" name="remember" type="checkbox" className="text-cyan-600 dark:border-white-400/20 dark:scale-100 transition-all duration-500 ease-in-out dark:hover:scale-110 dark:checked:scale-100 h-4 w-4"/>
-                  <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
->>>>>>> main
-                    Lembrar-me
-                  </label>
-                </div>
-                <a href="#" className="text-sm text-cyan-600 hover:underline">
-                  Esqueci minha senha
-                </a>
-              </div>
-
-              {/* Botão */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="mt-4 w-full bg-cyan-600 hover:bg-cyan-800 text-white font-semibold py-2 px-4 rounded-md transition duration-300 cursor-pointer"
-              >
-                {loading ? "Entrando..." : "Entrar"}
-              </button>
-            </form>
-          </article>
-        </section>
+      {/* Email */}
+      <div>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          E-mail
+        </label>
+        <div className="relative">
+          <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-cyan-600">
+            <BiEnvelope className="text-xl" />
+          </span>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="pl-10 pr-4 py-2 w-full border text-gray-700 border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500"
+          />
+        </div>
       </div>
-    </main>
+
+      {/* Senha */}
+      <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+      Senha
+    </label>
+    <div className="relative">
+      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-cyan-600">
+        <BiLock className="text-xl" />
+      </span>
+      <input
+        type={showPassword ? "text" : "password"} // <-- Muda o type dinamicamente!
+        id="password"
+        name="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        className="pl-10 pr-10 py-2 w-full border text-gray-700 border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500"
+      />
+      <span
+        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+        onClick={() => setShowPassword((prev) => !prev)} // <-- Toggle no clique
+      >
+                    {showPassword ? <BiHide className="text-xl" /> : <BiShow className="text-xl" />}
+                  </span >
+                </div >
+              </div >
+
+    {/* Lembrar e Esqueci */ }
+    < div className = "flex items-center justify-between" >
+      <div className="flex items-center">
+                  <input id="remember" name="remember" type="checkbox" className="text-cyan-600 dark:border-white-400/20 dark:scale-100 transition-all duration-500 ease-in-out dark:hover:scale-110 dark:checked:scale-100 h-4 w-4" />
+      <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
+        Lembrar-me
+      </label>
+    </div>
+    <a href="#" className="text-sm text-cyan-600 hover:underline">
+      Esqueci minha senha
+    </a>
+              </div >
+
+    {/* Botão */ }
+    < button
+  type = "submit"
+  disabled = { loading }
+  className = "mt-4 w-full bg-cyan-600 hover:bg-cyan-800 text-white font-semibold py-2 px-4 rounded-md transition duration-300 cursor-pointer"
+    >
+    { loading? "Entrando...": "Entrar" }
+              </button >
+            </form >
+          </article >
+        </section >
+      </div >
+    </main >
   );
 }
