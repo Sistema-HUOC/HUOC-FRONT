@@ -1,7 +1,9 @@
-"use client";
+'use client'
 
 import { useState, useEffect } from "react";
+import LogoutButton from "@/components/logoutButton/logoutButton"; 
 import Image from "next/image";
+<<<<<<< HEAD
 import LogoutButton from "@/components/logoutButton/logoutButton";
 import { accessEndpointMap, AccessLevel } from "./access";
 import React from "react";
@@ -30,6 +32,8 @@ type AddSpecProps = {
   setValue: (s: string) => void;
   onAdd: () => void;
 };
+=======
+>>>>>>> main
 
 export const AddSpecializationBlock: React.FC<AddSpecProps> = ({
   value,
@@ -168,6 +172,7 @@ export const ExtraFields = React.memo(
 
 export default function AdminHome() {
   const [userName, setUserName] = useState("");
+<<<<<<< HEAD
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false); // controle do modal pesquisa
 
@@ -203,6 +208,8 @@ export default function AdminHome() {
 
   const [loadingActivation, setLoadingActivation] = useState(false);
 
+=======
+>>>>>>> main
 
   useEffect(() => {
     fetch("http://localhost:4000/proxy/api/adm/especializacoes", {
@@ -220,11 +227,10 @@ export default function AdminHome() {
       } catch {
         setUserName("Usuário");
       }
-    } else {
-      setUserName("Usuário");
     }
   }, []);
 
+<<<<<<< HEAD
   //------------- Campos de Preenchimento Padrão -------------//
   function CommonFields() {
     return (
@@ -464,11 +470,14 @@ export default function AdminHome() {
 
 
 
+=======
+>>>>>>> main
   return (
     <div
-      className="relative flex flex-col items-center min-h-screen bg-cover bg-bottom px-4 py-8"
+      className="relative flex flex-col items-center justify-center min-h-screen bg-cover bg-bottom px-4"
       style={{ backgroundImage: "url('/bg.jpg')" }}
     >
+<<<<<<< HEAD
       {/* cabeçalho */}
       <header className="container-home1 mb-6 flex flex-col items-center">
         <div className="container-home2 text-center">
@@ -900,6 +909,26 @@ export default function AdminHome() {
           </div>
         </div>
       )}
+=======
+      <div className="container-home1 mb-6">
+        <div className="container-home2 text-center">
+
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <Image src="/huoc-system.png" alt="Ícone HUOC" width={60} height={48} className="h-12" />
+          </div>
+
+          {/* Título */}
+          <h1 className="text-content1 text-2xl font-bold mb-2">
+            Olá, {userName}!
+          </h1>
+          <p className="text-content2 text-md mb-6">
+            Você está acessando a área administrativa do Sistema HUOC.
+          </p>
+        </div>
+      </div>
+        <LogoutButton />
+>>>>>>> main
     </div>
   );
 }
