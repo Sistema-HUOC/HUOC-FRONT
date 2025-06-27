@@ -5,7 +5,7 @@ import { useState } from "react";
 import Image from "next/image";
 import * as XLSX from 'xlsx';
 
-// Types
+/* Types
 type Patient = {
   id: number;
   nome: string;
@@ -19,7 +19,7 @@ type Patient = {
   temperatura: string;
   satO2: number;
 };
-
+*/
 type FilterOptions = {
   gender: string;
   minAge: number | '';
