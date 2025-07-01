@@ -66,7 +66,7 @@ export default function LoginPage() {
         case "MEDICO":
           router.push("/doctorPage");
           break;
-        case "ENFERMEIRO":
+        case "ENFERMAGEM":
           router.push("/nursePage");
           break;
         case "PESQUISADOR":
